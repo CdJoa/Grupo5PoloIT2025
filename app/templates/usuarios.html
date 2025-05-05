@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mascotas</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'estilo.css' %}">
+
+</head>
+
+<body>
+    <h1>Listado de Usuarios</h1>
+
+    <div class="formulario">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Crear Usuario</button>
+        </form>
+    </div>
+
+    <div class="contenedor">
+        {% for u in usuarios %}
+        <div class="usuario">
+            <p><strong>ID:</strong> {{ u.id }}</p>
+            <p><strong>Nombre:</strong> {{ u.nombre }}</p>
+            <p><strong>Email:</strong> {{ u.mail }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'mascotas' %}"><button>Ir a Mascotas</button></a>
+</body>
+</html>
