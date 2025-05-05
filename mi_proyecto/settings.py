@@ -30,6 +30,10 @@ import os
 ALLOWED_HOSTS = [
     "grupo5poloit2025-production-c9b8.up.railway.app",
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://grupo5poloit2025-production-c9b8.up.railway.app"
+]
+
 
 # Para que también funcione en localhost
 if os.getenv("DJANGO_ENV") != "production":
