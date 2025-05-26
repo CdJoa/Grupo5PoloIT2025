@@ -4,8 +4,6 @@ Django==4.2.11
 gunicorn==21.2.0
 packaging==25.0
 psycopg2-binary==2.9.9
-pymodbus==3.9.2
-pyserial==3.5
 python-dotenv==1.0.1
 sqlparse==0.5.3
 tzdata==2025.2
