@@ -1,8 +1,8 @@
 # PetMatch🐾 Back End
 
-### [Enlace al repositorio Fack End](https://github.com/Alexus167/PetMatch))
+### [Enlace al repositorio Front End](https://github.com/Alexus167/PetMatch))
 
-#@ Guia instalacion
+## Guia instalacion
 
 ### Instalar Python 
 
