@@ -51,9 +51,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'login'
+    'cloudinary_storage',
+    'cloudinary',
 
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dlpzpq1hg',
+    'API_KEY': '565574663485436',
+    'API_SECRET': '8cAGVT75RC9pk8L6zuuuuqxyAjc',
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 
 MIDDLEWARE = [
@@ -96,7 +105,7 @@ DATABASES = {
     'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
-
+AUTH_USER_MODEL = 'app.Usuario'  
 
 
 # Password validation
@@ -149,3 +158,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Expira la sesión tras 30 minutos (1800 segundos) de inactividad
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+SESSION_SAVE_EVERY_REQUEST = True  # Reinicia el contador con cada request

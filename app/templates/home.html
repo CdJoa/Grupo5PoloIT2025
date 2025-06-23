@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'estilo.css' %}">
+{% extends "base.html" %}
 
-    <title>Inicio</title>
-</head>
-<body>
-    <h1>Django + PostgreSQL</h1>
-    <a href="{% url 'usuarios' %}"><button>Ir a Usuarios</button></a>
-    <a href="{% url 'mascotas' %}"><button>Ir a Mascotas</button></a>
-</body>
-</html>
+{% load static %}
+
+{% block title %}Task Page{% endblock %}
+
+{% block content %}
+    <h1>test</h1>
+    <p>Welcome to the task page!</p>
+    <p>Here you can manage your tasks.</p>
+    <ul>
+        <li>Task 1</li>
+        <li>Task 2</li>
+        <li>Task 3</li>
+    </ul>
+    <p>Feel free to add, edit, or delete tasks as needed.</p>
+{% endblock %}

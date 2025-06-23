@@ -9,6 +9,9 @@
 </head>
 
 <body>
+    {% extends "base.html" %}
+
+    {% block content %}
     <h1>Listado de Mascotas</h1>
 
     <form method="POST">
@@ -29,5 +32,6 @@
     </div>
 
     <a href="{% url 'usuarios' %}"><button>Ir a Usuarios</button></a>
+    {% endblock %}
 </body>
 </html>

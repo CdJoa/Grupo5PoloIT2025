@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registro – PetMatch{% endblock %}
+
+{% block content %}
+  <h1>login</h1>
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Iniciar sesión</button>
+    {% if mensaje %}
+        <div class="alert-success">{{ mensaje }}</div>
+    {% endif %}
+{% endblock %}

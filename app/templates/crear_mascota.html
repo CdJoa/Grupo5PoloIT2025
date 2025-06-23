@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Agregar Nueva Mascota</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label for="id_imagenes">Imágenes (hasta 10):</label>
+    <input type="file" name="imagenes" id="id_imagenes" multiple accept="image/*"><br><br>
+    <button type="submit">Guardar Mascota</button>
+</form>
+<a href="{% url 'perfil_usuario' %}">← Volver al perfil</a>
+
+{% for img in mascota.imagenes.all %}
+    <img src="{{ img.imagen.url }}" width="200">
+{% endfor %}
+{% endblock %}

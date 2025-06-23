@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PetMatch{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <link rel="icon" href="{% static 'img/favicon.ico' %}">
+  <script src="https://kit.fontawesome.com/tu-kit.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <header class="main-header">
+    <div class="top-bar">
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-x-twitter"></i></a>
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+      </div>
+      <div class="action-icons">
+        <a href="#"><i class="fas fa-search"></i></a>
+        <a href="{% url 'admin:index' %}"><i class="fas fa-user-cog"></i></a>
+      </div>
+    </div>
+
+    <div class="logo" style="display: flex; justify-content: space-between; align-items: center;">
+      <img src="{% static 'img/logo_petmatch.png' %}" alt="PetMatch" style="max-height: 60px;">
+
+      <div class="session-link" style="margin-left: auto; padding-right: 20px;">
+        {% if request.user.is_authenticated %}
+          <span style="margin-right: 10px;">Bienvenido, {{ request.user.username }}</span>
+          <a href="{% url 'perfil_usuario' %}">Mi perfil</a>
+          <a href="{% url 'logout' %}" style="margin-left: 10px;">Cerrar sesión</a>
+        {% else %}
+          <a href="{% url 'login' %}">Iniciar sesión</a>
+          <a href="{% url 'signup' %}" style="margin-left: 10px;">Registrarse</a>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <nav class="main-nav">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'perros' %}">Perros</a>
+      <a href="{% url 'gatos' %}">Gatos</a>
+      <a href="{% url 'contacto' %}">Contacto</a>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="main-footer">
+    <p>&copy; 2025 PetMatch — Todos los derechos reservados</p>
+  </footer>
+</body>
+</html>
