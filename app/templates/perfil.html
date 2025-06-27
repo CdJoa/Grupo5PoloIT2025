@@ -33,7 +33,6 @@
         <img src="{{ user.foto.url }}" alt="Foto de perfil" width="150">
     {% endif %}
 </div>
-<!-- MASCOTAS DEL USUARIO -->
 <div class="mascotas">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Mis Mascotas</h3>
@@ -47,7 +46,7 @@
         {% for m in mascotas %}
             <li>
                 <a href="{% url 'detalle_mascota' m.id %}">
-                    <strong>{{ m.nombre }}</strong> - {{ m.raza }} - {{ m.localidad }}<br>
+                    <strong>{{ m.nombre }}</strong> - {{ m.raza }} <br>
                     <div style="display:flex; gap:5px;">
                         {% for img in m.imagenes.all %}
                             <img src="{{ img.imagen.url }}" width="60" style="object-fit:cover; border-radius:4px;">

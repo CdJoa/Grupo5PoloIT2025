@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-
 from .models import *
 from .forms import *
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -12,35 +11,46 @@ from django.contrib import messages
 from django.forms import modelformset_factory
 from django.contrib.auth import logout
 
-
 def home(request):
-    return render(request, 'home.html')
+    form = BusquedaMascotaForm(request.GET or None)
+    mascotas = Mascota.objects.filter(disponible=True)
+
+    if form.is_valid():
+        especie = form.cleaned_data.get('especie')
+        provincia = form.cleaned_data.get('provincia')
+        localidad = form.cleaned_data.get('localidad')
+        castrado = form.cleaned_data.get('castrado')
+
+        if especie:
+            mascotas = mascotas.filter(especie=especie)
+        if provincia:
+            mascotas = mascotas.filter(provincia=provincia)
+        if localidad:
+            mascotas = mascotas.filter(localidad=localidad)
+        if castrado is not None:
+            mascotas = mascotas.filter(castrado=castrado)
+
+    return render(request, 'home.html', {
+        'form': form,
+        'mascotas': mascotas,
+    })
+
 
 
 def signup(request):
-    if request.method == 'GET':
-        form = UsuarioForm()
-        return render(request, 'signup.html', {'form': form})
-
-    elif request.method == 'POST':
+    if request.method == 'POST':
         form = UsuarioForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-
-            for _ in range(10):  
-                doc = get_random_string(length=8, allowed_chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-                if not Usuario.objects.filter(documento=doc).exists():
-                    user.documento = doc
-                    break
+            if user.generar_documento_unico():
+                user.save()
+                login(request, user)
+                return redirect('home')
             else:
-                form.add_error(None, "No se pudo generar un documento único. Intentá nuevamente.")
-                return render(request, 'signup.html', {'form': form})
-
-            user.save()
-            login(request, user)
-            return redirect('task')
-        else:
-            return render(request, 'signup.html', {'form': form})
+                form.add_error(None, "No se pudo generar un documento único.")
+    else:
+        form = UsuarioForm()
+    return render(request, 'signup.html', {'form': form})
 
 
 def login_view(request):
@@ -52,11 +62,10 @@ def login_view(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)  # Esto ahora sí llama a la función de Django
-            return redirect('task')
+            login(request, user)  
+            return redirect('home')
         else:
             return HttpResponse("Error: Credenciales inválidas.", status=400)
-        
 
 @login_required
 def perfil_usuario(request):
@@ -87,11 +96,11 @@ def crear_mascota(request):
         if form.is_valid():
             mascota = form.save(commit=False)
             mascota.duenio = request.user
+            mascota.provincia = request.user.provincia
+            mascota.localidad = request.user.localidad
             mascota.save()
-            # Guardar imágenes...
-            for img in imagenes[:10]:
+            for img in imagenes[:10]: 
                 MascotaImagen.objects.create(mascota=mascota, imagen=img)
-            # ACTUALIZAR mascotas_ids del usuario
             request.user.actualizar_mascotas_ids()
             return redirect('perfil_usuario')
     else:
@@ -104,15 +113,7 @@ def cargar_localidades(request):
     localidades = Localidad.objects.filter(id_provincia=provincia_id).values('id', 'nombre')
     return JsonResponse(list(localidades), safe=False)
 
-
-def task(request):
-    if request.method == 'POST':
-        # Aquí podrías manejar la lógica de la tarea
-        return render(request, 'home.html', {"mensaje": "Tarea ejecutada correctamente."})
-    else:
-        return render(request, 'home.html', {"mensaje": "Método no permitido."})
-
-
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('home')  
@@ -120,16 +121,46 @@ def logout_view(request):
 
 def detalle_mascota(request, mascota_id):
     mascota = Mascota.objects.get(id=mascota_id)
-    imagenes = mascota.imagenes.all()  # <--- Cambia esto
+    imagenes = mascota.imagenes.all() 
     if request.method == 'POST' and request.user == mascota.duenio:
         imagen_id = request.POST.get('imagen_id')
         if imagen_id:
-            # Desmarcar todas
             mascota.imagenes_extra.update(principal=False)
-            # Marcar la seleccionada
             MascotaImagen.objects.filter(id=imagen_id, mascota=mascota).update(principal=True)
             return redirect('detalle_mascota', mascota_id=mascota.id)
     return render(request, 'detalle_mascota.html', {
         'mascota': mascota,
         'imagenes': imagenes,
     })
+
+
+
+def mascotas_por_especie_view(request, especie, template_name):
+    form = BusquedaMascotaForm(request.GET or None)
+    mascotas = Mascota.objects.filter(disponible=True, especie=especie)
+
+    if form.is_valid():
+        provincia = form.cleaned_data.get('provincia')
+        localidad = form.cleaned_data.get('localidad')
+        castrado = form.cleaned_data.get('castrado')
+
+        if provincia:
+            mascotas = mascotas.filter(provincia=provincia)
+        if localidad:
+            mascotas = mascotas.filter(localidad=localidad)
+        if castrado is not None:
+            mascotas = mascotas.filter(castrado=castrado)
+
+    return render(request, template_name, {
+        'form': form,
+        'mascotas': mascotas,
+    })
+
+def perros_view(request):
+    return mascotas_por_especie_view(request, especie='perro', template_name='perros.html')
+
+def gatos_view(request):
+    return mascotas_por_especie_view(request, especie='gato', template_name='gatos.html')
+
+def contacto_view(request):
+    return render(request, 'contacto.html')

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gatos en Adopción{% endblock %}
+
+{% block content %}
+
+<h1>🐱 Gatos en adopción</h1>
+
+<form method="get" class="search-form">
+  <fieldset>
+    <legend>Filtrar por:</legend>
+    <p>{{ form.provincia.label_tag }} {{ form.provincia }}</p>
+    <p>{{ form.localidad.label_tag }} {{ form.localidad }}</p>
+    <p>{{ form.castrado.label_tag }} {{ form.castrado }}</p>
+  </fieldset>
+  <button type="submit">🔎 Buscar</button>
+</form>
+
+<hr>
+
+<h2>Resultados encontrados</h2>
+
+{% if mascotas %}
+  <ul class="result-list">
+    {% for mascota in mascotas %}
+      <li class="result-item">
+        <h3>{{ mascota.nombre }} ({{ mascota.get_especie_display }})</h3>
+        {% with mascota.imagenes.all|first as imagen %}
+          {% if imagen %}
+            <div class="mascota-imagen">
+              <img src="{{ imagen.imagen.url }}" alt="{{ mascota.nombre }}">
+            </div>
+          {% endif %}
+        {% endwith %}
+        <div class="mascota-info">
+          <p>
+            <strong>Provincia:</strong> {{ mascota.provincia }}<br>
+            <strong>Localidad:</strong> {{ mascota.localidad }}<br>
+            <strong>Edad:</strong> {{ mascota.get_edad_display }}<br>
+            <strong>Raza:</strong> {{ mascota.raza }}<br>
+            <strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}
+          </p>
+          <p>
+            <a href="{% url 'detalle_mascota' mascota.id %}">Ver detalle</a>
+          </p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No hay gatos que coincidan con la búsqueda.</p>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const provinciaSelect = document.getElementById("id_provincia");
+    const localidadSelect = document.getElementById("id_localidad");
+
+    if (provinciaSelect && localidadSelect) {
+        provinciaSelect.addEventListener('change', function() {
+            localidadSelect.innerHTML = '<option>Cargando...</option>';
+            fetch(`/ajax/cargar-localidades/?provincia_id=${provinciaSelect.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    localidadSelect.innerHTML = '<option value="">Seleccioná una localidad</option>';
+                    data.forEach(function(localidad) {
+                        const option = document.createElement('option');
+                        option.value = localidad.id;
+                        option.text = localidad.nombre;
+                        localidadSelect.appendChild(option);
+                    });
+                });
+        });
+    }
+});
+</script>
+
+{% endblock %}

@@ -2,6 +2,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django import forms
+import random, string
 
 class Usuario(AbstractUser):
     mail = models.EmailField(max_length=120, unique=True)
@@ -10,6 +11,7 @@ class Usuario(AbstractUser):
     provincia = models.ForeignKey('Provincia', on_delete=models.SET_NULL, null=True, db_column='provincia_id')
     localidad = models.ForeignKey('Localidad', on_delete=models.SET_NULL, null=True, db_column='localidad_id')
     mascotas_ids = models.CharField(max_length=255, blank=True, default='', db_column='mascotas_ids')
+    
 
     class Meta:
         db_table = 'usuarios'
@@ -34,6 +36,14 @@ class Usuario(AbstractUser):
         if existe:
             raise forms.ValidationError("Este documento ya está registrado.")
         return documento
+    
+    def generar_documento_unico(self):
+        for _ in range(10):
+            doc = ''.join(random.choices(string.ascii_uppercase, k=8))
+            if not Usuario.objects.filter(documento=doc).exists():
+                self.documento = doc
+                return True
+        return False
 
     def actualizar_mascotas_ids(self):
         ids = self.mascotas.values_list('id', flat=True)
@@ -54,8 +64,7 @@ class Provincia(models.Model):
 class Localidad(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    id_provincia = models.IntegerField()  # <-- este campo debe existir
-
+    id_provincia = models.IntegerField()  
     class Meta:
         db_table = 'localidades'
         managed = False
@@ -68,7 +77,8 @@ class Mascota(models.Model):
         ('perro', 'Perro'),
         ('gato', 'Gato'),
     ]
-
+            # 'perro' se guarda en la base de datos 
+            # 'Perro' se muestra en el formulario 
     EDAD_CHOICES = [
         ('cachorro', 'Cachorro'),
         ('adulto', 'Adulto'),
@@ -80,8 +90,18 @@ class Mascota(models.Model):
     especie = models.CharField(max_length=10, choices=ESPECIE_CHOICES)
     edad = models.CharField(max_length=10, choices=EDAD_CHOICES)
     raza = models.CharField(max_length=100)
-    localidad = models.CharField(max_length=100)  # Se copiará del usuario
-    provincia = models.CharField(max_length=100)  # Se copiará del usuario
+    localidad = models.ForeignKey(
+        Localidad,
+        on_delete=models.SET_NULL,
+        null=True,
+        db_column='localidad_id'
+    )
+    provincia = models.ForeignKey(
+        Provincia,
+        on_delete=models.SET_NULL,
+        null=True,
+        db_column='provincia_id'
+    )
     duenio = models.ForeignKey(
         Usuario,
         on_delete=models.DO_NOTHING,
@@ -90,11 +110,11 @@ class Mascota(models.Model):
     )
     castrado = models.BooleanField(default=False)
     descripcion = models.TextField(blank=True)
+    disponible = models.BooleanField(default=True)  
 
     class Meta:
         db_table = 'mascotas'
-        managed = False  # Si la tabla ya existe y no la maneja Django
-
+        managed = False  
     def __str__(self):
         return f"{self.especie} - {self.raza} ({self.edad})"
 
@@ -104,5 +124,5 @@ class MascotaImagen(models.Model):
     principal = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'mascota_imagenes'  # Puedes elegir el nombre que quieras
-        managed = False  # Deja que Django la maneje
+        db_table = 'mascota_imagenes'  
+        managed = False

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ mascota.raza }} - {{ mascota.localidad }}</h2>
+<h2>{{ mascota.nombre }} </h2>
 
 <div style="display: flex; gap: 10px;">
     {% for img in imagenes %}
@@ -15,5 +15,8 @@
 <p><strong>Especie:</strong> {{ mascota.especie }}</p>
 <p><strong>Descripción:</strong> {{ mascota.descripcion }}</p>
 <p><strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}</p>
+<p><strong>Provincia:</strong> {{ mascota.provincia}}</p>
+<p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
+
 <a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
 {% endblock %}
