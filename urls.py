@@ -1,0 +1,24 @@
+from django.urls import path
+from django.contrib import admin  
+from . import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', views.home, name='home'),
+    path('signup/', views.signup, name='signup'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('perros/', views.perros_view, name='perros'),
+    path('gatos/', views.gatos_view, name='gatos'),  
+    path('contacto/', views.contacto_view, name='contacto'),     
+    path('perfil/', views.perfil_usuario, name='perfil_usuario'),
+    path('ajax/cargar-localidades/', views.cargar_localidades, name='ajax_cargar_localidades'),
+    path('mascotas/nueva/', views.crear_mascota, name='crear_mascota'),
+    path('mascotas/<int:mascota_id>/', views.detalle_mascota, name='detalle_mascota'),
+    # ✅ NUEVO ENDPOINT API para el carrito:
+    path('api/carrito/', views.carrito_api, name='carrito_api'),
+    path('api/pets/', views.mascotas_api, name='mascotas_api'),
+    path('api/login/', views.api_login, name='api_login'),
+    path('api/pets/<int:mascota_id>/', views.mascota_detalle_api, name='mascota_detalle_api'),
+
+]
