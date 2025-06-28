@@ -31,17 +31,19 @@ ALLOWED_HOSTS = [
     "grupo5poloit2025-production-c9b8.up.railway.app",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://grupo5poloit2025-production-c9b8.up.railway.app"
+    "https://grupo5poloit2025-production-c9b8.up.railway.app",
 ]
 
-
-# Para que también funcione en localhost
 if os.getenv("DJANGO_ENV") != "production":
     ALLOWED_HOSTS.append("127.0.0.1")
     ALLOWED_HOSTS.append("localhost")
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ]
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
