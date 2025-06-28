@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect , get_object_or_404
+
 from .models import *
 from .forms import *
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -10,6 +11,8 @@ from django.utils.crypto import get_random_string
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.contrib.auth import logout
+from django.core.mail import send_mail
+
 
 def home(request):
     form = BusquedaMascotaForm(request.GET or None)
@@ -42,10 +45,11 @@ def signup(request):
         form = UsuarioForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            user.email_verificado = False
             if user.generar_documento_unico():
                 user.save()
-                login(request, user)
-                return redirect('home')
+                enviar_mail_verificacion(request, user)
+                return render(request, 'verifica_tu_email.html', {'email': user.email})
             else:
                 form.add_error(None, "No se pudo generar un documento único.")
     else:
@@ -90,18 +94,34 @@ def perfil_usuario(request):
 
 @login_required
 def crear_mascota(request):
+    usuario = request.user
+    try:
+        if not usuario.localidad:
+            raise ValueError("Debes completar tu perfil con la localidad correspondiente antes de crear una mascota.")
+        if not usuario.provincia:
+            raise ValueError("Debes completar tu perfil con la provincia correspondiente antes de crear una mascota.")
+        if not usuario.telefono:
+            raise ValueError("Debes completar tu perfil con el teléfono correspondiente antes de crear una mascota.")
+        if not usuario.documento:
+            raise ValueError("Debes completar tu perfil con el documento correspondiente antes de crear una mascota.")
+        if not usuario.email_verificado:
+            raise ValueError("Debes verificar tu email antes de crear una mascota.")
+    except ValueError as e:
+        messages.error(request, str(e))
+        return redirect('perfil_usuario')
+
     if request.method == 'POST':
         form = MascotaForm(request.POST)
         imagenes = request.FILES.getlist('imagenes')
         if form.is_valid():
             mascota = form.save(commit=False)
-            mascota.duenio = request.user
-            mascota.provincia = request.user.provincia
-            mascota.localidad = request.user.localidad
+            mascota.duenio = usuario
+            mascota.provincia = usuario.provincia
+            mascota.localidad = usuario.localidad
             mascota.save()
             for img in imagenes[:10]: 
                 MascotaImagen.objects.create(mascota=mascota, imagen=img)
-            request.user.actualizar_mascotas_ids()
+            usuario.actualizar_mascotas_ids()
             return redirect('perfil_usuario')
     else:
         form = MascotaForm()
@@ -164,3 +184,112 @@ def gatos_view(request):
 
 def contacto_view(request):
     return render(request, 'contacto.html')
+
+
+@login_required
+def solicitar_mascota(request, mascota_id):
+    mascota = get_object_or_404(Mascota, id=mascota_id)
+    if request.user == mascota.duenio:
+        messages.error(request, "No puedes solicitar tu propia mascota.")
+        return redirect('detalle_mascota', mascota_id=mascota_id)
+    if request.method == 'POST':
+        solicitud, created = SolicitudMascota.objects.get_or_create(
+            mascota=mascota,
+            solicitante=request.user,
+            duenio=mascota.duenio
+        )
+
+        send_mail(
+            subject='¡Tienes una nueva solicitud de adopción!',
+            message=f'{request.user.username} quiere adoptar a {mascota.nombre}. Ingresa a tu perfil para ver los detalles y chatear.',
+            from_email='matchpettest@gmail.com',
+            recipient_list=[mascota.duenio.email],
+            fail_silently=True,
+        )
+
+        messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes chatear con el dueño.")
+        return redirect('chat_solicitud', solicitud_id=solicitud.id)
+    return redirect('detalle_mascota', mascota_id=mascota_id)
+
+def base_context(request):
+    tiene_mensajes_nuevos = SolicitudMascota.objects.filter(
+        models.Q(duenio=request.user) | models.Q(solicitante=request.user),
+    ).exists() if request.user.is_authenticated else False
+    return {'tiene_mensajes_nuevos': tiene_mensajes_nuevos}
+
+
+@login_required
+def chat_solicitud(request, solicitud_id):
+    return render(request, 'chat.html', {'solicitud_id': solicitud_id})
+
+@login_required
+def mis_chats(request):
+    solicitudes = SolicitudMascota.objects.filter(
+        models.Q(solicitante=request.user) | models.Q(duenio=request.user)
+    ).order_by('-fecha')
+    return render(request, 'mis_chats.html', {'solicitudes': solicitudes})
+
+
+@login_required
+def solicitudes_recibidas(request):
+    solicitudes = SolicitudMascota.objects.filter(duenio=request.user, estado='pendiente')
+    return render(request, 'solicitudes_recibidas.html', {'solicitudes': solicitudes})
+
+
+@login_required
+def responder_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, duenio=request.user)
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        if accion == 'aceptar':
+            solicitud.estado = 'aceptada'
+        elif accion == 'rechazar':
+            solicitud.estado = 'rechazada'
+        solicitud.save()
+    return redirect('solicitudes_recibidas')
+
+
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+
+def enviar_mail_verificacion(request, user):
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    link = request.build_absolute_uri(
+        reverse('activar_cuenta', kwargs={'uidb64': uid, 'token': token})
+    )
+    send_mail(
+        'Verifica tu email en PetMatch',
+        f'Hola {user.username}, haz clic en el siguiente enlace para verificar tu email:\n{link}',
+        'matchpettest@gmail.com',
+        [user.email],
+        fail_silently=False,
+    )
+
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib import messages
+
+def activar_cuenta(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = Usuario.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Usuario.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.email_verificado = True
+        user.save()
+        messages.success(request, "¡Email verificado! Ya puedes iniciar sesión.")
+        return redirect('login')
+    else:
+        return HttpResponse("Enlace de activación inválido o expirado.", status=400)
+
+@login_required
+def reenviar_verificacion(request):
+    if request.method == 'POST' and not request.user.email_verificado:
+        enviar_mail_verificacion(request, request.user)
+        messages.success(request, "Te reenviamos el email de verificación.")
+    return redirect('perfil_usuario')

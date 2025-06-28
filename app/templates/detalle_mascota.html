@@ -18,5 +18,16 @@
 <p><strong>Provincia:</strong> {{ mascota.provincia}}</p>
 <p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
 
+{% if user.is_authenticated %}
+    {% if mascota.duenio != user %}
+        <form method="post" action="{% url 'solicitar_mascota' mascota.id %}">
+            {% csrf_token %}
+            <button type="submit">Solicitar adopción</button>
+        </form>
+    {% endif %}
+{% else %}
+    <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}">Iniciá sesión para solicitar adopción</a>
+{% endif %}
+
 <a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
 {% endblock %}

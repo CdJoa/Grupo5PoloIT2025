@@ -5,17 +5,17 @@ from django import forms
 import random, string
 
 class Usuario(AbstractUser):
-    mail = models.EmailField(max_length=120, unique=True)
     telefono = models.CharField(max_length=20, blank=True, default='')
     documento = models.CharField(max_length=20, unique=True)
     provincia = models.ForeignKey('Provincia', on_delete=models.SET_NULL, null=True, db_column='provincia_id')
     localidad = models.ForeignKey('Localidad', on_delete=models.SET_NULL, null=True, db_column='localidad_id')
     mascotas_ids = models.CharField(max_length=255, blank=True, default='', db_column='mascotas_ids')
-    
+    email = models.EmailField()
 
+    email_verificado = models.BooleanField(default=False)
     class Meta:
         db_table = 'usuarios'
-
+        managed = False  
     def __str__(self):
         return self.username
 
@@ -126,3 +126,17 @@ class MascotaImagen(models.Model):
     class Meta:
         db_table = 'mascota_imagenes'  
         managed = False
+
+class SolicitudMascota(models.Model):
+    mascota = models.ForeignKey(Mascota, on_delete=models.CASCADE, related_name='solicitudes')
+    solicitante = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes_enviadas')
+    duenio = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='solicitudes_recibidas')
+    fecha = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=20, default='pendiente') 
+
+    class Meta:
+        db_table = 'solicitudes_mascota'
+        managed = False
+
+    def __str__(self):
+        return f"{self.solicitante} → {self.mascota} ({self.estado})"

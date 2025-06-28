@@ -6,7 +6,7 @@ from django.db import connection
 class UsuarioForm(UserCreationForm):
     class Meta:
         model = Usuario
-        fields = ['username', 'mail', 'password1', 'password2']
+        fields = ['username', 'email','password1', 'password2']
         
 class MascotaForm(forms.ModelForm):
     class Meta:
@@ -53,7 +53,7 @@ class PerfilUsuarioForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ['mail', 'documento', 'telefono', 'provincia', 'localidad']
+        fields = ['email', 'documento', 'telefono', 'provincia', 'localidad']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -1,4 +1,4 @@
-#!/home/joa/Escritorio/Django-Postgre/venv-limpio/bin/python3
+#!/home/joa/Escritorio/Django-Postgre/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

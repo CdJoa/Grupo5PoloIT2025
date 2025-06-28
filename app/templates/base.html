@@ -31,6 +31,12 @@
         {% if request.user.is_authenticated %}
           <span style="margin-right: 10px;">Bienvenido, {{ request.user.username }}</span>
           <a href="{% url 'perfil_usuario' %}">Mi perfil</a>
+          <a href="{% url 'mis_chats' %}" title="Mensajes" style="font-size:1.4em; vertical-align:middle; position:relative;">
+            ✉️
+            {% if tiene_mensajes_nuevos %}
+              <span style="position:absolute; top:0; right:-5px; color:red; font-size:1.2em;">●</span>
+            {% endif %}
+          </a>
           <a href="{% url 'logout' %}" style="margin-left: 10px;">Cerrar sesión</a>
         {% else %}
           <a href="{% url 'login' %}">Iniciar sesión</a>
@@ -45,6 +51,7 @@
       <a href="{% url 'perros' %}">Perros</a>
       <a href="{% url 'gatos' %}">Gatos</a>
       <a href="{% url 'contacto' %}">Contacto</a>
+
     </nav>
   </header>
 

@@ -152,7 +152,14 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
 ]
 
-
+CORS_ALLOWED_ORIGINS = [
+    "https://petmatchreact.com",
+    # ...otros...
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://petmatchreact.com",
+    # ...otros...
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -163,3 +170,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Expira la sesión tras 30 minutos (1800 segundos) de inactividad
 SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
 SESSION_SAVE_EVERY_REQUEST = True  # Reinicia el contador con cada request
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'matchpettest@gmail.com'      # Tu correo
+EMAIL_HOST_PASSWORD = 'jeyw yeuc ifuo pbhf '  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

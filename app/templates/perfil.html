@@ -11,8 +11,8 @@
         <label for="{{ form.first_name.id_for_label }}">Nombre:</label>
         {{ form.first_name }}
 
-        <label for="{{ form.mail.id_for_label }}">Email:</label>
-        {{ form.mail }}
+        <label for="{{ form.email.id_for_label }}">Email:</label>
+        {{ form.email }}
 
         <label for="{{ form.documento.id_for_label }}">Documento:</label>
         {{ form.documento }}
@@ -33,6 +33,18 @@
         <img src="{{ user.foto.url }}" alt="Foto de perfil" width="150">
     {% endif %}
 </div>
+
+{% if not user.email_verificado %}
+  <div style="color: orange; margin-bottom: 1em;">
+    <b>Tu email no está verificado.</b><br>
+    <form method="post" action="{% url 'reenviar_verificacion' %}">
+      {% csrf_token %}
+      <button type="submit">Reenviar email de verificación</button>
+    </form>
+  </div>
+{% endif %}
+
+
 <div class="mascotas">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h3>Mis Mascotas</h3>
@@ -68,6 +80,8 @@
     {% endfor %}
   </ul>
 {% endif %}
+
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {

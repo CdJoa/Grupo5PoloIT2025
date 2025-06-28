@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mis Chats</h2>
+<ul>
+  {% for solicitud in solicitudes %}
+    <li>
+      Mascota: {{ solicitud.mascota.nombre }}<br>
+      Con: 
+      {% if solicitud.solicitante == user %}
+        Dueño: {{ solicitud.duenio.username }}
+      {% else %}
+        Solicitante: {{ solicitud.solicitante.username }}
+      {% endif %}
+      <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
+    </li>
+  {% empty %}
+    <li>No tienes chats activos.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
