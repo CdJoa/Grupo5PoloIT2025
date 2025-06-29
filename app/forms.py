@@ -3,10 +3,11 @@ from .models import *
 from .models import MascotaImagen  # Asegúrate de que MascotaImagen esté definido en models.py
 from django.contrib.auth.forms import UserCreationForm
 from django.db import connection
+
 class UsuarioForm(UserCreationForm):
     class Meta:
         model = Usuario
-        fields = ['username', 'mail', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2']
         
 class MascotaForm(forms.ModelForm):
     class Meta:
@@ -53,7 +54,7 @@ class PerfilUsuarioForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ['mail', 'documento', 'telefono', 'provincia', 'localidad']
+        fields = ['email', 'documento', 'telefono', 'provincia', 'localidad']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,19 +79,6 @@ class PerfilUsuarioForm(forms.ModelForm):
         if existe:
             raise forms.ValidationError("Este documento ya está registrado.")
         return documento
-
-
-    def clean_documento(self):
-        documento = self.cleaned_data.get('documento')
-        if not documento:
-            raise forms.ValidationError("El documento es obligatorio.")
-        if not documento.isdigit():
-            raise forms.ValidationError("Debe contener solo números.")
-        existe = Usuario.objects.filter(documento=documento).exclude(pk=self.instance.pk).exists()
-        if existe:
-            raise forms.ValidationError("Este documento ya está registrado.")
-        return documento
-    
 
 
 class BusquedaMascotaForm(forms.Form):
