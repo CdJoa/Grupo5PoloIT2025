@@ -1,0 +1,104 @@
+/* Barra superior sin fondo con íconos sociales y de acción */
+.top-icons-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  background-color: transparent; /* sin fondo */
+  color: #a04000;
+  font-size: 1.5rem;
+}
+
+.top-icons-bar a {
+  margin: 0 8px;
+  color: black;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.top-icons-bar a:hover {
+  color: #ff0000;
+}
+
+/* Contenedores flex para redes y acciones */
+.social-icons, .action-icons {
+  display: flex;
+  align-items: center;
+}
+
+/* Ícono carrito con contador rojo */
+.carrito-icon {
+  position: relative;
+  color: black;
+}
+
+.carrito-count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+/* Barra de navegación principal fondo negro */
+.main-nav {
+  background-color: orange;
+  padding: 10px 0;
+}
+
+.main-nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0 20px;
+}
+
+.main-nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.main-nav ul li a:hover {
+  color: red;
+}
+.pulse {
+  animation: pulse-animation 1.5s infinite;
+}
+
+.nav-adopcion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px; /* espacio entre íconos y texto */
+  color: #fff; /* blanco sobre el fondo naranja */
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.nav-adopcion:hover {
+  color: #ff0000;
+}
+
+.adopcion-icon {
+  color: #e65100;
+  font-size: 1.2rem;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+    color: #e65100;
+  }
+  100% {
+    transform: scale(1);
+  }
+}

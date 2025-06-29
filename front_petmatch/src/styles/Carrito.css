@@ -1,0 +1,89 @@
+.carrito-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    margin-top: 10px;
+}
+
+.carrito-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    /* Eliminé el borde sólido para un look más limpio */
+}
+
+.carrito-titulos h2 {
+  font-size: 1rem;       /* Tamaño de letra más pequeño */
+  font-weight: 500;      /* Peso de fuente medio para que no sean tan pesados */
+  color: grey;           /* Mantener el color gris */
+  margin: 0 8px;         /* Separación horizontal para que no queden pegados */
+  margin-top: 0;
+  margin-bottom: 0;  
+}
+.carrito-titulo-prod {
+    width: 15%;
+    color: grey;
+}
+
+.carrito-titulos {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 30%;
+    width: 100%;
+    color: grey;
+    padding-left: -100px; /* << Agregá esto */
+}
+
+
+.carrito-titulo-descrip {
+    width: 10%;
+    
+}
+
+.descripcion-carrito {
+    width: 30%;
+    color: grey;
+    font-size: 0.9rem;
+    max-width: 200px;
+    margin-right: 12px;
+}
+
+.carrito-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* Comenté la transición para no tener efecto hover */
+    /* transition: transform 0.3s ease; */
+}
+
+/*
+.carrito-image:hover {
+    transform: scale(1.5);
+}
+*/
+
+.carrito-boton {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.carrito-boton:hover {
+  background-color: #800020; /* color bordó */
+}
