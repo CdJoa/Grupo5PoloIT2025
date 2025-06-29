@@ -90,7 +90,6 @@ class PerfilUsuarioForm(forms.ModelForm):
         if existe:
             raise forms.ValidationError("Este documento ya está registrado.")
         return documento
-    
 
 
 class BusquedaMascotaForm(forms.Form):

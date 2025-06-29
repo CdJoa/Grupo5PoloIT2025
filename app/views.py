@@ -157,7 +157,7 @@ def detalle_mascota(request, mascota_id):
 
 def mascotas_por_especie_view(request, especie, template_name):
     form = BusquedaMascotaForm(request.GET or None)
-    mascotas = Mascota.objects.filter(disponible=True, especie=especie)
+    mascotas = Mascota.objects.filter(disponible=True, especie=especie, estado='esperando')
 
     if form.is_valid():
         provincia = form.cleaned_data.get('provincia')
@@ -208,7 +208,7 @@ def solicitar_mascota(request, mascota_id):
         )
 
         messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes ver el estado en tu bandeja de chats.")
-        return redirect('mis_chats')  # <--- Cambia esto
+        return redirect('mis_chats')  
     return redirect('detalle_mascota', mascota_id=mascota_id)
 
 def base_context(request):
@@ -221,33 +221,37 @@ def base_context(request):
 @login_required
 def chat_solicitud(request, solicitud_id):
     solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id)
-    if request.method == 'POST':
+    mensajes = MensajeChat.objects.filter(solicitud=solicitud).order_by('fecha')
+    existe_traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=solicitud.duenio,
+        duenio_nuevo=solicitud.solicitante,
+        estado='esperando'
+    ).exists()
+
+    if request.method == 'POST' and 'mensaje' in request.POST:
         texto = request.POST.get('mensaje')
         if texto:
             MensajeChat.objects.create(
                 solicitud=solicitud,
-                usuario=request.user,
+                usuario=request.user, 
                 texto=texto
             )
-            return redirect('chat_solicitud', solicitud_id=solicitud_id)
-    mensajes = MensajeChat.objects.filter(solicitud=solicitud).order_by('fecha')
+        return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
     return render(request, 'chat.html', {
         'solicitud': solicitud,
         'mensajes': mensajes,
+        'existe_traspaso': existe_traspaso,
     })
 
 @login_required
 def mis_chats(request):
     solicitudes = SolicitudMascota.objects.filter(
-        models.Q(solicitante=request.user) | models.Q(duenio=request.user)
+        (models.Q(solicitante=request.user) | models.Q(duenio=request.user)) &
+        ~models.Q(estado="rechazada")
     ).order_by('-fecha')
     return render(request, 'mis_chats.html', {'solicitudes': solicitudes})
-
-
-@login_required
-def solicitudes_recibidas(request):
-    solicitudes = SolicitudMascota.objects.filter(duenio=request.user, estado='pendiente')
-    return render(request, 'solicitudes_recibidas.html', {'solicitudes': solicitudes})
 
 
 @login_required
@@ -264,7 +268,7 @@ def responder_solicitud(request, solicitud_id):
             solicitud.estado = 'rechazada'
             solicitud.save()
             messages.info(request, "Solicitud rechazada.")
-        return redirect('solicitudes_recibidas')
+        return redirect('mis_chats')
     return render(request, 'responder_solicitud.html', {'solicitud': solicitud})
 
 
@@ -312,3 +316,70 @@ def reenviar_verificacion(request):
         enviar_mail_verificacion(request, request.user)
         messages.success(request, "Te reenviamos el email de verificación.")
     return redirect('perfil_usuario')
+
+@login_required
+def enviar_traspaso(request, solicitud_id):
+    try:
+        solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, duenio=request.user, estado='aceptada')
+        if request.method == 'POST':
+            traspaso = TraspasoMascota.objects.filter(
+                mascota=solicitud.mascota,
+                duenio_anterior=request.user,
+                duenio_nuevo=solicitud.solicitante
+            ).order_by('-fecha').first()
+            if traspaso and traspaso.estado == 'esperando':
+                messages.info(request, "Ya existe una solicitud de traspaso pendiente para esta mascota.")
+            elif traspaso and traspaso.estado == 'rechazada':
+                traspaso.estado = 'esperando'
+                traspaso.save()
+                messages.success(request, "Solicitud de traspaso reenviada.")
+            else:
+                TraspasoMascota.objects.create(
+                    mascota=solicitud.mascota,
+                    duenio_anterior=request.user,
+                    duenio_nuevo=solicitud.solicitante,
+                    estado='esperando'
+                )
+                messages.success(request, "Solicitud de traspaso enviada.")
+    except Exception as e:
+        messages.error(request, f"Ocurrió un error al enviar el traspaso: {str(e)}")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+@login_required
+def responder_traspaso(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, solicitante=request.user)
+    traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=solicitud.duenio,
+        duenio_nuevo=request.user,
+        estado='esperando'
+    ).first()
+    if request.method == 'POST' and traspaso:
+        accion = request.POST.get('accion')
+        if accion == 'aceptar':
+            traspaso.estado = 'aceptada'
+            traspaso.save()
+            solicitud.mascota.cambiar_duenio(request.user)
+            solicitud.mascota.estado = 'adoptado'  
+            solicitud.mascota.save()
+            messages.success(request, "¡Has aceptado el traspaso! Ahora eres el dueño de la mascota.")
+        elif accion == 'rechazar':
+            traspaso.estado = 'rechazada'
+            traspaso.save()
+            messages.info(request, "Has rechazado el traspaso.")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+@login_required
+def cancelar_traspaso(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, duenio=request.user)
+    traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=request.user,
+        duenio_nuevo=solicitud.solicitante,
+        estado='esperando'
+    ).first()
+    if request.method == 'POST' and traspaso:
+        traspaso.delete()
+        messages.success(request, "Solicitud de traspaso cancelada.")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)
+

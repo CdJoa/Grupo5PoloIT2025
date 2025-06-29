@@ -5,7 +5,12 @@
   {% regroup solicitudes by mascota as chats_por_mascota %}
   {% for grupo in chats_por_mascota %}
     <div class="chat-card">
-      <h3>Mascota: <span>{{ grupo.grouper.nombre }}</span></h3>
+      <h3>
+        {% if grupo.grouper.imagenes.all %}
+          <img src="{{ grupo.grouper.imagenes.all.0.imagen.url }}" alt="Foto de {{ grupo.grouper.nombre }}" width="60" style="vertical-align:middle; border-radius:8px; margin-right:8px;">
+        {% endif %}
+        Mascota: <span>{{ grupo.grouper.nombre }}</span>
+      </h3>
       {% for solicitud in grupo.list %}
         <div style="margin-bottom: 0.5em;">
           {% if solicitud.solicitante == user %}
@@ -36,4 +41,29 @@
     <div>No tienes chats activos.</div>
   {% endfor %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const botonesAceptar = document.querySelectorAll('button[name="accion"][value="aceptar"]');
+    const botonesRechazar = document.querySelectorAll('button[name="accion"][value="rechazar"]');
+
+    botonesAceptar.forEach(boton => {
+      boton.addEventListener('click', function(event) {
+        if (!confirm('¿Estás seguro de que deseas aceptar esta solicitud?')) {
+          event.preventDefault();
+        }
+      });
+    });
+
+    botonesRechazar.forEach(boton => {
+      boton.addEventListener('click', function(event) {
+        if (!confirm('¿Estás seguro de que deseas rechazar esta solicitud?')) {
+          event.preventDefault();
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

@@ -51,6 +51,18 @@ class Usuario(AbstractUser):
         self.mascotas_ids = ','.join(str(i) for i in ids)
         self.save()
 
+    def traspasar_mascota(self, mascota, nuevo_duenio):
+        try:
+            if mascota.duenio == self:
+                mascota.cambiar_duenio(nuevo_duenio)
+                self.actualizar_mascotas_ids()
+                nuevo_duenio.actualizar_mascotas_ids()
+                return True
+            return False
+        except Exception as e:
+            print(e) 
+            return False
+
 class Provincia(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
@@ -112,12 +124,24 @@ class Mascota(models.Model):
     castrado = models.BooleanField(default=False)
     descripcion = models.TextField(blank=True)
     disponible = models.BooleanField(default=True)  
+    estado = models.CharField(max_length=30, default='esperando')
 
     class Meta:
         db_table = 'mascotas'
         managed = False  
     def __str__(self):
         return f"{self.especie} - {self.raza} ({self.edad})"
+
+    def cambiar_duenio(self, nuevo_duenio):
+        duenio_anterior = self.duenio
+        self.duenio = nuevo_duenio
+        self.disponible = False
+        self.save()
+        TraspasoMascota.objects.create(
+            mascota=self,
+            duenio_anterior=duenio_anterior,
+            duenio_nuevo=nuevo_duenio
+        )
 
 class MascotaImagen(models.Model):
     mascota = models.ForeignKey(Mascota, related_name='imagenes', on_delete=models.CASCADE)
@@ -150,3 +174,21 @@ class MensajeChat(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username}: {self.texto[:30]}"
+
+class TraspasoMascota(models.Model):
+    ESTADO_CHOICES = [
+        ('esperando', 'Esperando'),
+        ('aceptada', 'Aceptada'),
+        ('rechazada', 'Rechazada'),
+    ]
+    mascota = models.ForeignKey(Mascota, on_delete=models.CASCADE)
+    duenio_anterior = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='traspasos_salientes')
+    duenio_nuevo = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='traspasos_entrantes')
+    fecha = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='esperando')
+
+    class Meta:
+        db_table = 'traspasos_mascota'
+        managed = False
+    def __str__(self):
+        return f"{self.mascota} - {self.duenio_anterior} → {self.duenio_nuevo} ({self.estado})"

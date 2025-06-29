@@ -48,9 +48,8 @@
             <button type="submit">Solicitar adopción</button>
         </form>
     {% endif %}
+    <a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
 {% else %}
     <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}">Iniciá sesión para solicitar adopción</a>
 {% endif %}
-
-<a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
 {% endblock %}
