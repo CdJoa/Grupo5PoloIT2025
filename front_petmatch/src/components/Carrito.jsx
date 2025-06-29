@@ -3,43 +3,81 @@ import { useEffect, useState } from "react";
 import CarritoCard from "./CarritoCard.jsx";
 import { Navigate } from "react-router-dom";
 
-export default function Carrito({petsCarrito, funcionBorrar, usuarioLogeado }) {
-
-    const total = petsCarrito.reduce(
-        (subTotal, pet) => subTotal + pet.price * pet.cantidad, 0
-    )
-
-    function funcionDisparadora(id){
-        funcionBorrar(id)
+// Obtener el CSRF desde las cookies
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === name + "=") {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
+  }
+  return cookieValue;
+}
+const csrfToken = getCookie("csrftoken");
 
-    console.log("Total: " + total)
+export default function Carrito({ petsCarrito, funcionBorrar, usuarioLogeado }) {
+  function funcionDisparadora(id) {
+    funcionBorrar(id);
+  }
 
-    if(!usuarioLogeado){
-        return(
-            <Navigate to="/login" replace/>
-        )
-    }
+  // Confirmar adopción (envía al backend)
+  function confirmarAdopcion() {
+    fetch("http://127.0.0.1:8000/api/adopcion/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      credentials: "include",
+      body: JSON.stringify({ mascotas: petsCarrito }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert("¡Adopción confirmada!");
+        // Podés limpiar el carrito aquí si querés:
+        // funcionBorrar("todo")
+      })
+      .catch((err) => {
+        console.error("Error al confirmar adopción:", err);
+        alert("Hubo un error al procesar la adopción.");
+      });
+  }
 
-    return(
-        <div className="carrito-container">
-            <div className="carrito-titulos" >
-                <h2 className="carrito-titulo-pet"> Producto </h2>
-                <h2 className="carrito-titulo-descrip">Descripción</h2>
-                <h2>  </h2>
-                <h2> Cantidad </h2>
-                <h2> Precio unitario </h2>
-                <h2> Sub total </h2>
-                <h2>  </h2>
+  // Si no está logueado, redirige al login
+  if (!usuarioLogeado) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
+    <div className="carrito-container">
+      {petsCarrito.length > 0 ? (
+        <>
+          {petsCarrito.map((pet) => (
+            <div key={pet.id} className="carrito-titulos">
+              <h2 className="carrito-titulo-pet">{pet.nombre}</h2>
+              <h2 className="carrito-titulo-descrip">{pet.descripcion}</h2>
+              <p><strong>Especie:</strong> {pet.especie}</p>
+              <p><strong>Provincia:</strong> {pet.provincia}</p>
+              <p><strong>Localidad:</strong> {pet.localidad}</p>
+
+              <CarritoCard
+                pet={pet}
+                funcionDisparadora={funcionDisparadora}
+              />
             </div>
-            {petsCarrito.length > 0 ? petsCarrito.map((pet) => (                
-                <CarritoCard 
-                    pet={pet} 
-                    funcionDisparadora={funcionDisparadora}
-                    />           
-            ))
-            : <p>Carrito vacio</p>}
-            {total > 0 ?  <span>Total: {total.toFixed(2)} $</span> : <></> }
-        </div>
-    )
+          ))}
+          <button onClick={confirmarAdopcion} className="btn-confirmar">
+            Confirmar adopción
+          </button>
+        </>
+      ) : (
+        <p>Carrito vacío</p>
+      )}
+    </div>
+  );
 }
