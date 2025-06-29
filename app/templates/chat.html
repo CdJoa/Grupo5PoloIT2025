@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Chat de Solicitud #{{ solicitud_id }}</h2>
-<div id="chat-log"></div>
-<input id="chat-message-input" type="text" size="100">
-<button id="chat-message-submit">Enviar</button>
-<script>
-    const solicitudId = "{{ solicitud_id }}";
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host +
-        '/ws/chat/' + solicitudId + '/'
-    );
-
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        document.querySelector('#chat-log').innerHTML += ('<br><b>' + data.user + ':</b> ' + data.message);
-    };
-
-    document.querySelector('#chat-message-submit').onclick = function(e) {
-        const input = document.querySelector('#chat-message-input');
-        chatSocket.send(JSON.stringify({'message': input.value}));
-        input.value = '';
-    };
-</script>
+<h2>
+  Chat con 
+  {% if solicitud.duenio == user %}
+    {{ solicitud.solicitante.username }}
+  {% else %}
+    {{ solicitud.duenio.username }}
+  {% endif %}
+</h2>
+<div style="border:1px solid #ffa500; padding:1em; margin-bottom:1em; background:#fff;">
+  {% for mensaje in mensajes %}
+    <div>
+      <b>{{ mensaje.usuario.username }}:</b> {{ mensaje.texto }}
+      <span style="font-size:0.8em;color:#888;">{{ mensaje.fecha|date:"d/m/Y H:i" }}</span>
+    </div>
+  {% empty %}
+    <div>No hay mensajes aún.</div>
+  {% endfor %}
+</div>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="mensaje" style="width:70%;" required>
+  <button type="submit">Enviar</button>
+</form>
 {% endblock %}

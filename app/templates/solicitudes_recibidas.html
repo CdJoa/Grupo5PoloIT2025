@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Solicitudes Recibidas</h2>
+<ul>
+  {% for solicitud in solicitudes %}
+    <li>
+      Mascota: {{ solicitud.mascota.nombre }}<br>
+      Solicitante: {{ solicitud.solicitante.username }}<br>
+      Estado: {{ solicitud.estado }}<br>
+      {% if solicitud.estado == "pendiente" %}
+        <form method="post" action="{% url 'responder_solicitud' solicitud.id %}">
+          {% csrf_token %}
+          <button name="accion" value="aceptar">Aceptar</button>
+          <button name="accion" value="rechazar">Rechazar</button>
+        </form>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No tienes solicitudes recibidas.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

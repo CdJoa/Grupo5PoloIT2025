@@ -207,8 +207,8 @@ def solicitar_mascota(request, mascota_id):
             fail_silently=True,
         )
 
-        messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes chatear con el dueño.")
-        return redirect('chat_solicitud', solicitud_id=solicitud.id)
+        messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes ver el estado en tu bandeja de chats.")
+        return redirect('mis_chats')  # <--- Cambia esto
     return redirect('detalle_mascota', mascota_id=mascota_id)
 
 def base_context(request):
@@ -220,7 +220,21 @@ def base_context(request):
 
 @login_required
 def chat_solicitud(request, solicitud_id):
-    return render(request, 'chat.html', {'solicitud_id': solicitud_id})
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id)
+    if request.method == 'POST':
+        texto = request.POST.get('mensaje')
+        if texto:
+            MensajeChat.objects.create(
+                solicitud=solicitud,
+                usuario=request.user,
+                texto=texto
+            )
+            return redirect('chat_solicitud', solicitud_id=solicitud_id)
+    mensajes = MensajeChat.objects.filter(solicitud=solicitud).order_by('fecha')
+    return render(request, 'chat.html', {
+        'solicitud': solicitud,
+        'mensajes': mensajes,
+    })
 
 @login_required
 def mis_chats(request):
@@ -243,10 +257,15 @@ def responder_solicitud(request, solicitud_id):
         accion = request.POST.get('accion')
         if accion == 'aceptar':
             solicitud.estado = 'aceptada'
+            solicitud.save()
+            messages.success(request, "Solicitud aceptada. Ahora puedes chatear con el adoptante.")
+            return redirect('chat_solicitud', solicitud_id=solicitud.id) 
         elif accion == 'rechazar':
             solicitud.estado = 'rechazada'
-        solicitud.save()
-    return redirect('solicitudes_recibidas')
+            solicitud.save()
+            messages.info(request, "Solicitud rechazada.")
+        return redirect('solicitudes_recibidas')
+    return render(request, 'responder_solicitud.html', {'solicitud': solicitud})
 
 
 from django.core.mail import send_mail

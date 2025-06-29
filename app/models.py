@@ -2,6 +2,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django import forms
+from django.conf import settings
 import random, string
 
 class Usuario(AbstractUser):
@@ -140,3 +141,12 @@ class SolicitudMascota(models.Model):
 
     def __str__(self):
         return f"{self.solicitante} → {self.mascota} ({self.estado})"
+
+class MensajeChat(models.Model):
+    solicitud = models.ForeignKey(SolicitudMascota, on_delete=models.CASCADE, related_name='mensajes')
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    texto = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.usuario.username}: {self.texto[:30]}"

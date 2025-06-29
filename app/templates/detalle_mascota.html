@@ -19,7 +19,30 @@
 <p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
 
 {% if user.is_authenticated %}
-    {% if mascota.duenio != user %}
+    {% if mascota.duenio == user %}
+        <h3>Solicitudes de adopción recibidas</h3>
+        <ul>
+        {% for solicitud in mascota.solicitudes.all %}
+            <li>
+                Solicitante: {{ solicitud.solicitante.username }}<br>
+                Estado: {{ solicitud.estado }}<br>
+                {% if solicitud.estado == "pendiente" %}
+                    <form method="post" action="{% url 'responder_solicitud' solicitud.id %}">
+                        {% csrf_token %}
+                        <button name="accion" value="aceptar">Aceptar</button>
+                        <button name="accion" value="rechazar">Rechazar</button>
+                    </form>
+                {% elif solicitud.estado == "aceptada" %}
+                    <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
+                {% elif solicitud.estado == "rechazada" %}
+                    <span style="color: red;">(Solicitud rechazada)</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No hay solicitudes para esta mascota.</li>
+        {% endfor %}
+        </ul>
+    {% elif mascota.duenio != user %}
         <form method="post" action="{% url 'solicitar_mascota' mascota.id %}">
             {% csrf_token %}
             <button type="submit">Solicitar adopción</button>

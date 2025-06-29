@@ -1,20 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Mis Chats</h2>
-<ul>
-  {% for solicitud in solicitudes %}
-    <li>
-      Mascota: {{ solicitud.mascota.nombre }}<br>
-      Con: 
-      {% if solicitud.solicitante == user %}
-        Dueño: {{ solicitud.duenio.username }}
-      {% else %}
-        Solicitante: {{ solicitud.solicitante.username }}
-      {% endif %}
-      <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
-    </li>
+<div class="chats-grid">
+  {% regroup solicitudes by mascota as chats_por_mascota %}
+  {% for grupo in chats_por_mascota %}
+    <div class="chat-card">
+      <h3>Mascota: <span>{{ grupo.grouper.nombre }}</span></h3>
+      {% for solicitud in grupo.list %}
+        <div style="margin-bottom: 0.5em;">
+          {% if solicitud.solicitante == user %}
+            Con Dueño: <b>{{ solicitud.duenio.username }}</b>
+          {% else %}
+            Con Solicitante: <b>{{ solicitud.solicitante.username }}</b>
+          {% endif %}
+          <br>
+          Estado:
+          {% if solicitud.estado == "pendiente" %}
+            <span style="color: orange;">(Esperando confirmación)</span>
+            {% if solicitud.duenio == user %}
+              <form method="post" action="{% url 'responder_solicitud' solicitud.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button name="accion" value="aceptar">Aceptar</button>
+                <button name="accion" value="rechazar">Rechazar</button>
+              </form>
+            {% endif %}
+          {% elif solicitud.estado == "aceptada" %}
+            <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
+          {% elif solicitud.estado == "rechazada" %}
+            <span style="color: red;">(Solicitud rechazada)</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
   {% empty %}
-    <li>No tienes chats activos.</li>
+    <div>No tienes chats activos.</div>
   {% endfor %}
-</ul>
+</div>
 {% endblock %}
