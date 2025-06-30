@@ -1,95 +1,110 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mi Perfil – PetMatch{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perros_gatos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>Mi Perfil</h2>
 
-<div class="perfil">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <h3>Datos personales</h3>
+<div class="perfil-container">
+  <h2 class="perfil-title">Mi Perfil</h2>
 
-        <label for="{{ form.first_name.id_for_label }}">Nombre:</label>
-        {{ form.first_name }}
+  <div class="perfil-form-wrapper">
+    <form method="POST" enctype="multipart/form-data" class="perfil-form">
+      {% csrf_token %}
+      <h3>Datos personales</h3>
 
-        <label for="{{ form.mail.id_for_label }}">Email:</label>
-        {{ form.mail }}
+      <label for="{{ form.first_name.id_for_label }}">Nombre:</label>
+      {{ form.first_name }}
 
-        <label for="{{ form.documento.id_for_label }}">Documento:</label>
-        {{ form.documento }}
+      <label for="{{ form.mail.id_for_label }}">Email:</label>
+      {{ form.mail }}
 
-        <label for="{{ form.telefono.id_for_label }}">Teléfono:</label>
-        {{ form.telefono }}
+      <label for="{{ form.documento.id_for_label }}">Documento:</label>
+      {{ form.documento }}
 
-        <label for="{{ form.provincia.id_for_label }}">Provincia:</label>
-        {{ form.provincia }}
+      <label for="{{ form.telefono.id_for_label }}">Teléfono:</label>
+      {{ form.telefono }}
 
-        <label for="{{ form.localidad.id_for_label }}">Localidad:</label>
-        {{ form.localidad }}
+      <label for="{{ form.provincia.id_for_label }}">Provincia:</label>
+      {{ form.provincia }}
 
-        <button type="submit">Guardar cambios</button>
+      <label for="{{ form.localidad.id_for_label }}">Localidad:</label>
+      {{ form.localidad }}
+
+      <button type="submit" class="btn-guardar">Guardar cambios</button>
     </form>
 
     {% if user.foto %}
-        <img src="{{ user.foto.url }}" alt="Foto de perfil" width="150">
+      <div class="perfil-foto">
+        <img src="{{ user.foto.url }}" alt="Foto de perfil">
+      </div>
     {% endif %}
-</div>
-<div class="mascotas">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3>Mis Mascotas</h3>
-        <a href="{% url 'crear_mascota' %}">
-            <button type="button">+ Agregar Mascota</button>
-        </a>
+  </div>
+
+  <div class="perfil-mascotas">
+    <div class="mascotas-header">
+      <h3>Mis Mascotas</h3>
+      <a href="{% url 'crear_mascota' %}" class="btn-agregar-mascota">+ Agregar Mascota</a>
     </div>
 
     {% if mascotas %}
-        <ul>
+      <ul class="mascota-lista">
         {% for m in mascotas %}
-            <li>
-                <a href="{% url 'detalle_mascota' m.id %}">
-                    <strong>{{ m.nombre }}</strong> - {{ m.raza }} <br>
-                    <div style="display:flex; gap:5px;">
-                        {% for img in m.imagenes.all %}
-                            <img src="{{ img.imagen.url }}" width="60" style="object-fit:cover; border-radius:4px;">
-                        {% endfor %}
-                    </div>
-                </a>
-            </li>
+          <li class="mascota-item">
+            <a href="{% url 'detalle_mascota' m.id %}">
+              <strong>{{ m.nombre }}</strong> – {{ m.raza }}
+              <div class="mascota-imagenes">
+                {% for img in m.imagenes.all %}
+                  <img src="{{ img.imagen.url }}" alt="{{ m.nombre }}">
+                {% endfor %}
+              </div>
+            </a>
+          </li>
         {% endfor %}
-        </ul>
+      </ul>
     {% else %}
-        <p>No tenés mascotas registradas.</p>
+      <p>No tenés mascotas registradas.</p>
     {% endif %}
+  </div>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <div class="logout-btn-container">
+  <a href="{% url 'logout' %}" class="btn-logout">Cerrar sesión</a>
 </div>
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const provinciaSelect = document.getElementById("id_provincia");
-    const localidadSelect = document.getElementById("id_localidad");
+document.addEventListener("DOMContentLoaded", function () {
+  const provinciaSelect = document.getElementById("id_provincia");
+  const localidadSelect = document.getElementById("id_localidad");
 
-    provinciaSelect.addEventListener('change', function() {
-        localidadSelect.innerHTML = '<option>Cargando...</option>';
-        fetch(`/ajax/cargar-localidades/?provincia_id=${provinciaSelect.value}`)
-            .then(response => response.json())
-            .then(data => {
-                localidadSelect.innerHTML = '<option value="">Seleccioná una localidad</option>';
-                data.forEach(function(localidad) {
-                    const option = document.createElement('option');
-                    option.value = localidad.id;
-                    option.text = localidad.nombre;
-                    localidadSelect.appendChild(option);
-                });
-            });
-    });
+  provinciaSelect.addEventListener('change', function () {
+    localidadSelect.innerHTML = '<option>Cargando...</option>';
+    fetch(`/ajax/cargar-localidades/?provincia_id=${provinciaSelect.value}`)
+      .then(response => response.json())
+      .then(data => {
+        localidadSelect.innerHTML = '<option value="">Seleccioná una localidad</option>';
+        data.forEach(function (localidad) {
+          const option = document.createElement('option');
+          option.value = localidad.id;
+          option.text = localidad.nombre;
+          localidadSelect.appendChild(option);
+        });
+      });
+  });
 });
 </script>
-
 
 {% endblock %}

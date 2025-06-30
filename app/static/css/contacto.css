@@ -1,0 +1,57 @@
+.contacto-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: #290B00;
+}
+
+.contacto-container h2 {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 1rem;
+}
+
+.contacto-container p {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.contacto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contacto-form label {
+  font-weight: 600;
+  color: #290B00;
+}
+
+.contacto-form input,
+.contacto-form textarea {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.contacto-form button {
+  align-self: flex-start;
+  padding: 0.6rem 1.2rem;
+  background-color: #e65100;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.contacto-form button:hover {
+  background-color: #bf360c;
+}
