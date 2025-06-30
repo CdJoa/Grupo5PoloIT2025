@@ -183,7 +183,16 @@ def gatos_view(request):
     return mascotas_por_especie_view(request, especie='gato', template_name='gatos.html')
 
 def contacto_view(request):
-    return render(request, 'contacto.html')
+    form = ContactoForm()
+    if request.method == 'POST':
+        form = ContactoForm(request.POST)
+        if form.is_valid():
+            mensaje = form.save(commit=False)
+            mensaje.resuelto = False  # fuerza el valor
+            mensaje.save()
+            messages.success(request, "¡Mensaje enviado!")
+            return redirect('home')
+    return render(request, 'contacto.html', {'form': form})
 
 
 @login_required
