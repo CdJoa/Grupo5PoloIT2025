@@ -192,3 +192,22 @@ class TraspasoMascota(models.Model):
         managed = False
     def __str__(self):
         return f"{self.mascota} - {self.duenio_anterior} → {self.duenio_nuevo} ({self.estado})"
+
+class MensajeContacto(models.Model):
+    nombre = models.CharField(max_length=100)
+    email = models.EmailField()
+    tema = models.CharField(max_length=100)
+    mensaje = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    resuelto = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'mensajes_contacto'
+        managed = False
+
+    def __str__(self):
+        return f"{self.nombre} ({self.email}) - {'Resuelto' if self.resuelto else 'Pendiente'}"
+
+    def marcar_como_resuelto(self):
+        self.resuelto = True
+        self.save()

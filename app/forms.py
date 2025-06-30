@@ -120,3 +120,9 @@ class BusquedaMascotaForm(forms.Form):
         self.fields['localidad'].queryset = get_localidades_queryset_from_data(
             self.data
         )
+
+
+class ContactoForm(forms.ModelForm):
+    class Meta:
+        model = MensajeContacto
+        fields = ['nombre', 'email', 'tema', 'mensaje']

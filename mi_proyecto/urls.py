@@ -18,6 +18,5 @@ from django.contrib import admin
 from django.urls import path, include  # 👈 importante incluir esto
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', include('app.urls')),     # 👈 esto conecta tu app
 ]
