@@ -1,6 +1,6 @@
 from django import forms
 from .models import *
-from .models import MascotaImagen  # Asegúrate de que MascotaImagen esté definido en models.py
+
 from django.contrib.auth.forms import UserCreationForm
 from django.db import connection
 class UsuarioForm(UserCreationForm):

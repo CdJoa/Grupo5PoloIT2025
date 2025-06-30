@@ -183,15 +183,7 @@ def gatos_view(request):
     return mascotas_por_especie_view(request, especie='gato', template_name='gatos.html')
 
 def contacto_view(request):
-    if request.method == 'POST':
-        form = ContactoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "¡Tu mensaje fue enviado correctamente!")
-            return redirect('contacto')
-    else:
-        form = ContactoForm()
-    return render(request, 'contacto.html', {'form': form})
+    return render(request, 'contacto.html')
 
 
 @login_required
@@ -204,21 +196,19 @@ def solicitar_mascota(request, mascota_id):
         solicitud, created = SolicitudMascota.objects.get_or_create(
             mascota=mascota,
             solicitante=request.user,
-            duenio=mascota.duenio,
-            defaults={'estado': 'pendiente'}
+            duenio=mascota.duenio
         )
-        if not created:
-            messages.info(request, "Ya enviaste una solicitud para esta mascota.")
-        else:
-            send_mail(
-                subject='¡Tienes una nueva solicitud de adopción!',
-                message=f'{request.user.username} quiere adoptar a {mascota.nombre}. Ingresa a tu perfil para ver los detalles y chatear.',
-                from_email='matchpettest@gmail.com',
-                recipient_list=[mascota.duenio.email],
-                fail_silently=True,
-            )
-            messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes ver el estado en tu bandeja de chats.")
-        return redirect('mis_chats')
+
+        send_mail(
+            subject='¡Tienes una nueva solicitud de adopción!',
+            message=f'{request.user.username} quiere adoptar a {mascota.nombre}. Ingresa a tu perfil para ver los detalles y chatear.',
+            from_email='matchpettest@gmail.com',
+            recipient_list=[mascota.duenio.email],
+            fail_silently=True,
+        )
+
+        messages.success(request, "Solicitud enviada al dueño de la mascota. Ahora puedes ver el estado en tu bandeja de chats.")
+        return redirect('mis_chats')  
     return redirect('detalle_mascota', mascota_id=mascota_id)
 
 def base_context(request):
@@ -392,16 +382,4 @@ def cancelar_traspaso(request, solicitud_id):
         traspaso.delete()
         messages.success(request, "Solicitud de traspaso cancelada.")
     return redirect('chat_solicitud', solicitud_id=solicitud_id)
-
-
-def contacto_view(request):
-    if request.method == 'POST':
-        form = ContactoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "¡Tu mensaje fue enviado correctamente!")
-            return redirect('contacto')
-    else:
-        form = ContactoForm()
-    return render(request, 'contacto.html', {'form': form})
 

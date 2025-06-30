@@ -12,13 +12,19 @@ python3 -m venv venv
 ### Activar entorno virtual
 cd venv/Scripts/activate  (source venv/bin/activate   en linux)
 
-### Instalar Django y dependencias
-pip install Django==4.2.11 gunicorn==21.2.0 dj-database-url==1.0.0 psycopg2-binary==2.9.9 python-dotenv==1.0.1 whitenoise==6.6.0
-
 ### Guardar dependencias en requirements.txt
-pip freeze > requirements.txt
+pip install -r requirements.txt
 
 ### correr con el entorno virtual activado 
 
 python manage.py runserver
 (python3  manage.py runserver)
+
+### mail de la pagina
+matchpettest@gmail.com
+
+
+### Notas Testing
+no hay... falta alguna especie de validación para solicitar mascotas y chats cuando tienen el perfil incompleto
+
+tambien sale error 404 cuando una sesion expiro pero como estas inactivo te desconecto y seguis viendo tu sesion hasta q interactuas con algun boton
