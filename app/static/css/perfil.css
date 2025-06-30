@@ -27,11 +27,10 @@
 }
 
 .perfil-form label {
-  display: block;
-  margin-bottom: 0.2em;
   font-weight: bold;
   color: #290B00;
   margin-top: 1rem;
+  margin-bottom: 0.2rem;
 }
 
 .perfil-form input,
@@ -40,8 +39,6 @@
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  display: block;
-  margin-bottom: 1em;
 }
 
 .btn-guardar {
@@ -156,8 +153,19 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+.btn-volver-perfil {
+  display: inline-block;
+  margin-top: 2rem;
+  background-color: #e65100;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
 
-.input-disabled {
-  background: #eee;
-  color: #888;
+.btn-volver-perfil:hover {
+  background-color: #bf360c;
+  text-decoration: underline;
 }

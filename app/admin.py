@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Mascota, SolicitudMascota, TraspasoMascota, MensajeChat, MensajeContacto, Usuario
+from .models import Mascota, SolicitudMascota, TraspasoMascota, MensajeChat, MensajeContacto, Usuario,MensajeContactoResuelto
 
 class MascotaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'duenio', 'estado')
@@ -13,6 +13,14 @@ class MensajeContactoPendienteAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.filter(resuelto=False)
 
+class MensajeContactoResueltoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'email', 'tema', 'mensaje', 'fecha', 'resuelto')
+    search_fields = ('nombre', 'email', 'tema')
+    list_filter = ('resuelto',)
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(resuelto=True)
+
 class UsuarioAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'email', 'is_active')
     search_fields = ('username', 'email')
@@ -24,4 +32,5 @@ class UsuarioAdmin(admin.ModelAdmin):
 admin.site.register(Mascota, MascotaAdmin)
 admin.site.register(SolicitudMascota)
 admin.site.register(MensajeContacto, MensajeContactoPendienteAdmin)
+admin.site.register(MensajeContactoResuelto, MensajeContactoResueltoAdmin)
 admin.site.register(Usuario, UsuarioAdmin)

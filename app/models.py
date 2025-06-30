@@ -211,3 +211,9 @@ class MensajeContacto(models.Model):
     def marcar_como_resuelto(self):
         self.resuelto = True
         self.save()
+
+class MensajeContactoResuelto(MensajeContacto):
+    class Meta:
+        proxy = True
+        verbose_name = "Mensaje de Contacto Resuelto"
+        verbose_name_plural = "Mensajes de Contacto Resueltos"
