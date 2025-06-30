@@ -1,22 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalle de {{ mascota.nombre }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perros_gatos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/detalle.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>{{ mascota.nombre }} </h2>
 
-<div style="display: flex; gap: 10px;">
-    {% for img in imagenes %}
-        <div style="position: relative; display: inline-block;">
-            <img src="{{ img.imagen.url }}" width="200">
+<div class="detalle-container">
+  <div class="card detalle-card">
+    {% if imagenes %}
+      <div class="row g-0">
+        <div class="col-md-5">
+          <div id="carouselDetalle" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for img in imagenes %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ img.imagen.url }}" class="d-block w-100 detalle-img" alt="Imagen de {{ mascota.nombre }}">
+                </div>
+              {% endfor %}
+            </div>
+            {% if imagenes|length > 1 %}
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselDetalle" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselDetalle" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              </button>
+            {% endif %}
+          </div>
         </div>
-    {% endfor %}
+        <div class="col-md-7">
+          <div class="card-body detalle-info">
+            <h2 class="card-title">{{ mascota.nombre }}</h2>
+            <p><strong>Edad:</strong> {{ mascota.get_edad_display }}</p>
+            <p><strong>Especie:</strong> {{ mascota.get_especie_display }}</p>
+            <p><strong>Raza:</strong> {{ mascota.raza }}</p>
+            <p><strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}</p>
+            <p><strong>Provincia:</strong> {{ mascota.provincia }}</p>
+            <p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
+            <p><strong>Descripción:</strong><br>{{ mascota.descripcion }}</p>
+            <div class="d-flex align-items-center mt-3">
+                <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'mis_chats' %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="card-body">
+        <h2 class="card-title">{{ mascota.nombre }}</h2>
+        <p>No hay imágenes disponibles.</p>
+        <div class="d-flex align-items-center mt-3">
+            <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'mis_chats' %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+            {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
 </div>
-
-<p><strong>Edad:</strong> {{ mascota.edad }}</p>
-<p><strong>Especie:</strong> {{ mascota.especie }}</p>
-<p><strong>Descripción:</strong> {{ mascota.descripcion }}</p>
-<p><strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}</p>
-<p><strong>Provincia:</strong> {{ mascota.provincia}}</p>
-<p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
 
 {% if user.is_authenticated %}
     {% if mascota.duenio == user %}
@@ -43,13 +100,14 @@
         {% endfor %}
         </ul>
     {% elif mascota.duenio != user %}
-        <form method="post" action="{% url 'solicitar_mascota' mascota.id %}">
+        <form method="post" action="{% url 'solicitar_mascota' mascota.id %}" style="display:inline;">
             {% csrf_token %}
-            <button type="submit">Solicitar adopción</button>
+            <button type="submit" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</button>
         </form>
     {% endif %}
     <a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
 {% else %}
-    <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}">Iniciá sesión para solicitar adopción</a>
+    <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
 {% endif %}
+
 {% endblock %}

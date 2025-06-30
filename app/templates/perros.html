@@ -3,9 +3,15 @@
 
 {% block title %}Perros en Adopción{% endblock %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perros_gatos.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<h1>🐶 Perros en adopción</h1>
+<div class="titulo-section">
+  <h1>Perros en adopción 🐶</h1>
+</div>
 
 <form method="get" class="search-form">
   <fieldset>
@@ -19,35 +25,37 @@
 
 <hr>
 
-<h2>Resultados encontrados</h2>
+<div class="subtitulo-section">
+  <h2>Resultados encontrados</h2>
+</div>
 
 {% if mascotas %}
-  <ul class="result-list">
+  <section class="cards-container">
     {% for mascota in mascotas %}
-      <li class="result-item">
-        <h3>{{ mascota.nombre }} ({{ mascota.get_especie_display }})</h3>
-        {% with mascota.imagenes.all|first as imagen %}
-          {% if imagen %}
-            <div class="mascota-imagen">
+      <article class="card-custom">
+        <a href="{% url 'detalle_mascota' mascota.id %}">
+          {% with mascota.imagenes.all|first as imagen %}
+            {% if imagen %}
               <img src="{{ imagen.imagen.url }}" alt="{{ mascota.nombre }}">
-            </div>
-          {% endif %}
-        {% endwith %}
-        <div class="mascota-info">
-          <p>
+            {% else %}
+              <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+            {% endif %}
+          {% endwith %}
+        </a>
+        <div class="card-body-custom">
+          <h3 class="card-title-custom">{{ mascota.nombre }}</h3>
+          <p class="card-text-custom">
             <strong>Provincia:</strong> {{ mascota.provincia }}<br>
             <strong>Localidad:</strong> {{ mascota.localidad }}<br>
             <strong>Edad:</strong> {{ mascota.get_edad_display }}<br>
             <strong>Raza:</strong> {{ mascota.raza }}<br>
             <strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}
           </p>
-          <p>
-            <a href="{% url 'detalle_mascota' mascota.id %}">Ver detalle</a>
-          </p>
+          <a href="{% url 'detalle_mascota' mascota.id %}" class="btn-adoptar">Ver detalle</a>
         </div>
-      </li>
+      </article>
     {% endfor %}
-  </ul>
+  </section>
 {% else %}
   <p>No hay perros que coincidan con la búsqueda.</p>
 {% endif %}

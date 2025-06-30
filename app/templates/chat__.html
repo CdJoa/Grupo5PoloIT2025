@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="chat-titulo">
+  Chat con 
+  {% if solicitud.duenio == user %}
+    {{ solicitud.solicitante.username }}
+  {% else %}
+    {{ solicitud.duenio.username }}
+  {% endif %}
+  sobre <span class="chat-mascota-nombre">{{ solicitud.mascota.nombre }}</span>
+</h2>
+
+<div class="chat-mascota-info">
+  {% if solicitud.mascota.imagenes.all %}
+    <img src="{{ solicitud.mascota.imagenes.all.0.imagen.url }}" alt="Foto de {{ solicitud.mascota.nombre }}" class="chat-mascota-img">
+  {% endif %}
+  <span><strong>Mascota:</strong> {{ solicitud.mascota.nombre }}</span>
+</div>
+
+<div class="chat-contenedor-mensajes">
+  {% for mensaje in mensajes %}
+    <div class="{% if mensaje.usuario == user %}chat-mensaje propio{% else %}chat-mensaje{% endif %}">
+      <strong>
+        {% if mensaje.usuario == user %}Tú{% else %}{{ mensaje.usuario.username }}{% endif %}
+      :</strong> {{ mensaje.texto }}
+      <span class="chat-fecha">{{ mensaje.fecha|date:"d/m/Y H:i" }}</span>
+    </div>
+  {% empty %}
+    <div>No hay mensajes aún.</div>
+  {% endfor %}
+</div>
+
+<form method="post" class="chat-form">
+  {% csrf_token %}
+  <input type="text" name="mensaje" class="chat-input" required>
+  <button type="submit" class="chat-boton-enviar">Enviar</button>
+</form>
+
+{# ... Mantené la lógica condicional para el traspaso, pero aplicá las mismas clases de botón ya usadas #}
+
+{% endblock %}
