@@ -1,9 +1,20 @@
-.chat-titulo {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+.chat-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #290B00;
 }
 
-.chat-mascota-nombre {
+.chat-title {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 1.5rem;
+}
+
+.highlight {
   color: #ffa500;
 }
 
@@ -11,57 +22,207 @@
   display: flex;
   align-items: center;
   gap: 1em;
-  margin-bottom: 1em;
+  margin-bottom: 1.5em;
 }
 
 .chat-mascota-img {
+  border-radius: 8px;
   width: 80px;
+  height: auto;
+}
+
+.chat-mensajes-container {
+  border: 1px solid #ffa500;
+  background: #fff;
+  padding: 1em;
+  margin-bottom: 1em;
   border-radius: 8px;
 }
 
-.chat-contenedor-mensajes {
-  border: 1px solid #ffa500;
-  padding: 1em;
-  margin-bottom: 1em;
-  background: #fff;
-}
-
-.chat-mensaje {
-  background: #f9f9f9;
+.mensaje-propio,
+.mensaje-ajeno {
+  margin-bottom: 0.5em;
   padding: 0.5em;
   border-radius: 6px;
-  margin-bottom: 0.5em;
-  text-align: left;
 }
 
-.chat-mensaje.propio {
-  background: #e6ffe6;
+.mensaje-propio {
+  background-color: #e6ffe6;
   text-align: right;
 }
 
-.chat-fecha {
+.mensaje-ajeno {
+  background-color: #f9f9f9;
+  text-align: left;
+}
+
+.mensaje-fecha {
+  display: block;
   font-size: 0.8em;
   color: #888;
-  margin-left: 0.5em;
+  margin-top: 0.3em;
 }
 
 .chat-form {
   display: flex;
   gap: 1em;
-  align-items: center;
+  margin-bottom: 2em;
 }
 
 .chat-input {
   flex: 1;
-  padding: 0.5em;
-  border-radius: 5px;
+  padding: 0.6rem;
   border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
-.chat-boton-enviar {
-  background: #ffa500;
-  color: white;
-  padding: 0.5em 1em;
+.btn-enviar,
+.btn-traspaso,
+.btn-cancelar,
+.btn-aceptar,
+.btn-rechazar {
+  padding: 0.6rem 1.2rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-enviar {
+  background-color: #e65100;
+  color: white;
+}
+
+.btn-enviar:hover {
+  background-color: #bf360c;
+}
+
+.btn-traspaso {
+  background-color: #ffa500;
+  color: white;
+}
+
+.btn-cancelar {
+  background-color: #888;
+  color: white;
+}
+
+.btn-aceptar {
+  background-color: green;
+  color: white;
+}
+
+.btn-rechazar {
+  background-color: red;
+  color: white;
+}
+
+.traspaso-rechazado {
+  color: red;
+  margin-bottom: 1em;
+}
+
+.traspaso-pendiente,
+.traspaso-propuesta {
+  color: #333;
+  margin-bottom: 1em;
+}
+
+.chat-list-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background-color: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #290B00;
+}
+
+.chat-title {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 2rem;
+}
+
+.chats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chat-card {
+  background: #fff;
+  border: 1px solid #ffd4b0;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+
+.chat-img-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.chat-mascota-nombre {
+  font-weight: bold;
+  color: #e65100;
+}
+
+.chat-item {
+  margin-top: 1rem;
+}
+
+.estado {
+  font-weight: bold;
+}
+
+.estado-pendiente {
+  color: orange;
+}
+
+.estado-rechazada {
+  color: red;
+}
+
+.form-respuesta {
+  margin-top: 0.5rem;
+}
+
+.btn-aceptar,
+.btn-rechazar {
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 0.5rem;
+}
+
+.btn-aceptar {
+  background-color: green;
+}
+
+.btn-rechazar {
+  background-color: red;
+}
+
+.link-chat {
+  display: inline-block;
+  margin-top: 0.5rem;
+  background-color: #e65100;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.link-chat:hover {
+  background-color: #bf360c;
 }

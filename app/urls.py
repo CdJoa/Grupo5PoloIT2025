@@ -36,10 +36,13 @@ urlpatterns = [
     # Rutas de solicitudes y chat
     path('mascotas/<int:mascota_id>/solicitar/', views.solicitar_mascota, name='solicitar_mascota'),
     path('chat/<int:solicitud_id>/', views.chat_solicitud, name='chat_solicitud'),
+    path('chat/', views.lista_chats, name='lista_chats'),
     path('mensajes/', views.mis_chats, name='mis_chats'),
     path('solicitudes/', views.solicitudes_recibidas, name='solicitudes_recibidas'),
     path('solicitudes/<int:solicitud_id>/responder/', views.responder_solicitud, name='responder_solicitud'),
-
+    path('usuarios/', views.lista_usuarios, name='lista_usuarios'),
+    path('mascotas/', views.mascotas_view, name='mascotas'),
+    
     # Activación y verificación
     path('activar/<uidb64>/<token>/', views.activar_cuenta, name='activar_cuenta'),
     path('reenviar-verificacion/', views.reenviar_verificacion, name='reenviar_verificacion'),
@@ -54,4 +57,5 @@ urlpatterns = [
     path('traspaso/<int:solicitud_id>/enviar/', views.enviar_traspaso, name='enviar_traspaso'),
     path('traspaso/<int:solicitud_id>/responder/', views.responder_traspaso, name='responder_traspaso'),
     path('traspaso/<int:solicitud_id>/cancelar/', views.cancelar_traspaso, name='cancelar_traspaso'),
+    
 ]

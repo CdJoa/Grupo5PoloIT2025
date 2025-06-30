@@ -1,0 +1,72 @@
+.mascotas-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background-color: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: #290B00;
+}
+
+.mascotas-title {
+  text-align: center;
+  color: #e65100;
+  margin-bottom: 1.5rem;
+}
+
+.mascotas-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mascotas-form button.btn-crear {
+  width: fit-content;
+  padding: 0.6rem 1.2rem;
+  background-color: #e65100;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mascotas-form button.btn-crear:hover {
+  background-color: #bf360c;
+}
+
+.mascotas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mascota-item {
+  background-color: #fef3e7;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.mascota-item p {
+  margin: 0.2rem 0;
+}
+
+.btn-usuarios {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #666;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-usuarios:hover {
+  background-color: #333;
+}
+

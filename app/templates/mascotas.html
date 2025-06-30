@@ -1,37 +1,35 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Mascotas</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'estilo.css' %}">
+{% extends "base.html" %}
+{% load static %}
 
-</head>
+{% block title %}Listado de Mascotas – PetMatch{% endblock %}
 
-<body>
-    {% extends "base.html" %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/mascotas.css' %}">
+{% endblock %}
 
-    {% block content %}
-    <h1>Listado de Mascotas</h1>
+{% block content %}
+  <div class="mascotas-container">
+    <h2 class="mascotas-title">Listado de Mascotas</h2>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Crear Mascota</button>
+    <form method="POST" class="mascotas-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-crear">Crear Mascota</button>
     </form>
 
-    <div class="contenedor">
-        {% for m in mascotas %}
-        <div class="usuario">
-            <p><strong>ID:</strong> {{ m.id }}</p>
-            <p><strong>Raza:</strong> {{ m.raza }}</p>
-            <p><strong>Localidad:</strong> {{ m.localidad }}</p>
-            <p><strong>Dueño:</strong> {{ m.duenio.nombre }}</p>
+    <div class="mascotas-lista">
+      {% for m in mascotas %}
+        <div class="mascota-item">
+          <p><strong>ID:</strong> {{ m.id }}</p>
+          <p><strong>Raza:</strong> {{ m.raza }}</p>
+          <p><strong>Localidad:</strong> {{ m.localidad }}</p>
+          <p><strong>Dueño:</strong> {{ m.duenio.nombre }}</p>
         </div>
-        {% endfor %}
+      {% empty %}
+        <p>No hay mascotas registradas.</p>
+      {% endfor %}
     </div>
 
-    <a href="{% url 'usuarios' %}"><button>Ir a Usuarios</button></a>
-    {% endblock %}
-</body>
-</html>
+    <a href="{% url 'usuarios' %}" class="btn-usuarios">Ir a Usuarios</a>
+  </div>
+{% endblock %}

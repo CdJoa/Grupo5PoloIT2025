@@ -1,33 +1,38 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Mascotas</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'estilo.css' %}">
-</head>
+{% extends "base.html" %}
+{% load static %}
 
-<body>
-    <h1>Listado de Usuarios</h1>
+{% block title %}Usuarios – PetMatch{% endblock %}
 
-    <div class="formulario">
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Crear Usuario</button>
-        </form>
-    </div>
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+{% endblock %}
 
-    <div class="contenedor">
-        {% for u in usuarios %}
-        <div class="usuario">
-            <p><strong>ID:</strong> {{ u.id }}</p>
-            <p><strong>Nombre:</strong> {{ u.nombre }}</p>
-            <p><strong>Email:</strong> {{ u.mail }}</p>
-        </div>
-        {% endfor %}
-    </div>
+{% block content %}
+<div class="usuarios-container">
+  <h2 class="usuarios-title">Listado de Usuarios</h2>
 
-    <a href="{% url 'mascotas' %}"><button>Ir a Mascotas</button></a>
-</body>
-</html>
+  <div class="formulario-usuario">
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn-crear">Crear Usuario</button>
+    </form>
+  </div>
+
+  <div class="usuarios-listado">
+    {% for u in usuarios %}
+      <div class="usuario-card">
+        <p><strong>ID:</strong> {{ u.id }}</p>
+        <p><strong>Nombre:</strong> {{ u.nombre }}</p>
+        <p><strong>Email:</strong> {{ u.mail }}</p>
+      </div>
+    {% empty %}
+      <p>No hay usuarios registrados.</p>
+    {% endfor %}
+  </div>
+
+  <div class="btn-ir-mascotas">
+    <a href="{% url 'mascotas' %}" class="btn-link">Ir a Mascotas</a>
+  </div>
+</div>
+{% endblock %}

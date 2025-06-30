@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -524,3 +525,13 @@ def cancelar_traspaso(request, solicitud_id):
         traspaso.delete()
         messages.success(request, "Solicitud de traspaso cancelada.")
     return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+def lista_chats(request):
+    return render(request, 'chat.html')
+
+def lista_usuarios(request):
+    return render(request, 'usuarios.html')
+
+def mascotas_view(request):
+    # lógica para mostrar mascotas
+    return render(request, 'mascotas.html')
