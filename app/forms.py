@@ -1,8 +1,7 @@
+# forms.py
 from django import forms
 from .models import *
-from .models import MascotaImagen  # Asegúrate de que MascotaImagen esté definido en models.py
 from django.contrib.auth.forms import UserCreationForm
-from django.db import connection
 
 class UsuarioForm(UserCreationForm):
     class Meta:
@@ -14,23 +13,19 @@ class MascotaForm(forms.ModelForm):
         model = Mascota
         fields = ['nombre', 'especie', 'edad', 'raza', 'castrado', 'descripcion']
 
-
 class MascotaImagenForm(forms.ModelForm):
     class Meta:
         model = MascotaImagen
         fields = ['imagen']
 
 def get_localidades_queryset_from_data(data, initial=None):
-
     provincia = None
-
     if data and 'provincia' in data:
         try:
             provincia_id = int(data.get('provincia'))
             provincia = Provincia.objects.get(id=provincia_id)
         except (ValueError, Provincia.DoesNotExist):
             provincia = None
-
     elif initial:
         provincia = initial
 
@@ -38,7 +33,6 @@ def get_localidades_queryset_from_data(data, initial=None):
         return Localidad.objects.filter(id_provincia=provincia.id)
     else:
         return Localidad.objects.none()
-
 
 class PerfilUsuarioForm(forms.ModelForm):
     provincia = forms.ModelChoiceField(
@@ -63,7 +57,6 @@ class PerfilUsuarioForm(forms.ModelForm):
             self.initial['documento'] = ''
 
         self.fields['provincia'].queryset = Provincia.objects.all()
-
         self.fields['localidad'].queryset = get_localidades_queryset_from_data(
             self.data,
             initial=self.instance.provincia if self.instance else None
@@ -79,7 +72,6 @@ class PerfilUsuarioForm(forms.ModelForm):
         if existe:
             raise forms.ValidationError("Este documento ya está registrado.")
         return documento
-
 
 class BusquedaMascotaForm(forms.Form):
     especie = forms.ChoiceField(
@@ -105,7 +97,4 @@ class BusquedaMascotaForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.fields['localidad'].queryset = get_localidades_queryset_from_data(
-            self.data
-        )
+        self.fields['localidad'].queryset = get_localidades_queryset_from_data(self.data)

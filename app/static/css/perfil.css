@@ -143,3 +143,13 @@
   text-decoration: underline;
   color: #e65100;
 }
+.btn-secundario {
+  background-color: #999999;
+  color: #fef3e7;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}

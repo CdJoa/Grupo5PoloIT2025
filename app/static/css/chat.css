@@ -1,0 +1,67 @@
+.chat-titulo {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.chat-mascota-nombre {
+  color: #ffa500;
+}
+
+.chat-mascota-info {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.chat-mascota-img {
+  width: 80px;
+  border-radius: 8px;
+}
+
+.chat-contenedor-mensajes {
+  border: 1px solid #ffa500;
+  padding: 1em;
+  margin-bottom: 1em;
+  background: #fff;
+}
+
+.chat-mensaje {
+  background: #f9f9f9;
+  padding: 0.5em;
+  border-radius: 6px;
+  margin-bottom: 0.5em;
+  text-align: left;
+}
+
+.chat-mensaje.propio {
+  background: #e6ffe6;
+  text-align: right;
+}
+
+.chat-fecha {
+  font-size: 0.8em;
+  color: #888;
+  margin-left: 0.5em;
+}
+
+.chat-form {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 0.5em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.chat-boton-enviar {
+  background: #ffa500;
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+}

@@ -23,28 +23,35 @@ urlpatterns = [
     path('ajax/cargar-localidades/', views.cargar_localidades, name='ajax_cargar_localidades'),
     path('mascotas/nueva/', views.crear_mascota, name='crear_mascota'),
     path('mascotas/<int:mascota_id>/', views.detalle_mascota, name='detalle_mascota'),
-    # ✅ NUEVO ENDPOINT API para el carrito:
+
+    # Rutas API REST
     path('api/carrito/', views.carrito_api, name='carrito_api'),
     path('api/pets/', views.mascotas_api, name='mascotas_api'),
     path('api/login/', views.api_login, name='api_login'),
     path('api/pets/<int:mascota_id>/', views.mascota_detalle_api, name='mascota_detalle_api'),
-    # ✅ Rutas que te faltaban del otro archivo:
+    path('api/adopcion/', confirmar_adopcion),
+    path('api/no-autenticado/', views.no_autenticado_api, name='no_autenticado_api'),
+    path('api/', include(router.urls)),
+
+    # Rutas de solicitudes y chat
     path('mascotas/<int:mascota_id>/solicitar/', views.solicitar_mascota, name='solicitar_mascota'),
     path('chat/<int:solicitud_id>/', views.chat_solicitud, name='chat_solicitud'),
     path('mensajes/', views.mis_chats, name='mis_chats'),
     path('solicitudes/', views.solicitudes_recibidas, name='solicitudes_recibidas'),
     path('solicitudes/<int:solicitud_id>/responder/', views.responder_solicitud, name='responder_solicitud'),
+
+    # Activación y verificación
     path('activar/<uidb64>/<token>/', views.activar_cuenta, name='activar_cuenta'),
     path('reenviar-verificacion/', views.reenviar_verificacion, name='reenviar_verificacion'),
-    # ✅ Rutas de reset de contraseña de Django:
+
+    # Reset de contraseña (Django auth views)
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='password_reset_form.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html'), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset_complete.html'), name='password_reset_complete'),
-    path('api/adopcion/', confirmar_adopcion),
-    #path('api/login/', views.api_login, name='api_login'),
-    path('api/no-autenticado/', views.no_autenticado_api, name='no_autenticado_api'),
-    path('api/', include(router.urls)),
+
+    # Rutas de traspaso (del otro lado)
+    path('traspaso/<int:solicitud_id>/enviar/', views.enviar_traspaso, name='enviar_traspaso'),
+    path('traspaso/<int:solicitud_id>/responder/', views.responder_traspaso, name='responder_traspaso'),
+    path('traspaso/<int:solicitud_id>/cancelar/', views.cancelar_traspaso, name='cancelar_traspaso'),
 ]
-
-

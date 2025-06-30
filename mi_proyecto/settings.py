@@ -10,37 +10,34 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$dw@)@^=jlvza8%f-njn-ep%kfiz9ne0n9p#a3(62511-l39mh'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-import os
 
 ALLOWED_HOSTS = [
     "grupo5poloit2025-production-c9b8.up.railway.app",
 ]
+
 CSRF_TRUSTED_ORIGINS = [
-    "https://grupo5poloit2025-production-c9b8.up.railway.app"
+    "https://grupo5poloit2025-production-c9b8.up.railway.app",
 ]
 
-
-# Para que también funcione en localhost
 if os.getenv("DJANGO_ENV") != "production":
-    ALLOWED_HOSTS.append("127.0.0.1")
-    ALLOWED_HOSTS.append("localhost")
-
-
-# Application definition
+    ALLOWED_HOSTS += ["127.0.0.1", "localhost"]
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -49,13 +46,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'app',
     'cloudinary_storage',
     'cloudinary',
     'corsheaders',
     'rest_framework',
-    'rest_framework.authtoken',  # si usás token login
-
+    'rest_framework.authtoken',  # para token login
+    'channels',
 ]
 
 CLOUDINARY_STORAGE = {
@@ -63,12 +61,11 @@ CLOUDINARY_STORAGE = {
     'API_KEY': '565574663485436',
     'API_SECRET': '8cAGVT75RC9pk8L6zuuuuqxyAjc',
 }
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-
-
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # <--- añadir esta línea
+    'corsheaders.middleware.CorsMiddleware',  # debe ir primero
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -76,16 +73,15 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    "django.contrib.sessions.middleware.SessionMiddleware",
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'mi_proyecto.urls'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'app', 'templates')],  
+        'DIRS': [os.path.join(BASE_DIR, 'app', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,81 +96,44 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
-
-import dj_database_url
-from dotenv import load_dotenv
-load_dotenv()
-
 DATABASES = {
     'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
-AUTH_USER_MODEL = 'app.Usuario'  
+AUTH_USER_MODEL = 'app.Usuario'
 
-# URL a la que Django redirige si un usuario no autenticado intenta acceder a login_required
 LOGIN_URL = '/login/'
 
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'app', 'static'),
 ]
 
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Expira la sesión tras 30 minutos (1800 segundos) de inactividad
-SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
-SESSION_SAVE_EVERY_REQUEST = True  # Reinicia el contador con cada request
-SESSION_COOKIE_SAMESITE = 'Lax'  # o 'None' si usas https y dominios cruzados
-SESSION_COOKIE_SECURE = False    # True solo si usas HTTPS
+SESSION_COOKIE_AGE = 1800  # 30 minutos
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = False  # True en producción con HTTPS
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = False
 
+# CORS
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5174",
@@ -186,20 +145,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
-CORS_ALLOWED_ORIGINS = [os.getenv("FRONTEND_URL", "http://localhost:5173")]
-
+# Si querés permitir todos los orígenes (solo desarrollo)
 CORS_ALLOW_ALL_ORIGINS = True
-
 CORS_ALLOW_CREDENTIALS = True
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -208,6 +156,19 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-        
-    ]
+    ],
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'matchpettest@gmail.com'
+EMAIL_HOST_PASSWORD = 'jeyw yeuc ifuo pbhf'  # Recordá usar variables de entorno para producción
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
 }

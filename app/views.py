@@ -3,31 +3,28 @@ from django.http import HttpResponse, JsonResponse, Http404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.tokens import default_token_generator
-from django.forms import modelformset_factory
 from django.core.mail import send_mail
-from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.crypto import get_random_string
-from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET
-from .models import Carrito
+
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from rest_framework.response import Response
-from .serializers import CarritoSerializer
+
 import json
 
 from .models import *
 from .forms import *
+from .serializers import CarritoSerializer
+
+# --- Vistas básicas ---
 
 def home(request):
     form = BusquedaMascotaForm(request.GET or None)
@@ -48,11 +45,7 @@ def home(request):
         if castrado is not None:
             mascotas = mascotas.filter(castrado=castrado)
 
-    return render(request, 'home.html', {
-        'form': form,
-        'mascotas': mascotas,
-    })
-
+    return render(request, 'home.html', {'form': form, 'mascotas': mascotas})
 
 
 def signup(request):
@@ -81,15 +74,17 @@ def login_view(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)  
+            login(request, user)
             return redirect('home')
         else:
             return HttpResponse("Error: Credenciales inválidas.", status=400)
+
 
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
+
 
 @login_required
 def perfil_usuario(request):
@@ -100,22 +95,19 @@ def perfil_usuario(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Datos guardados correctamente.")
-
             return redirect('perfil_usuario')
     else:
         form = PerfilUsuarioForm(instance=usuario)
 
     mascotas = Mascota.objects.filter(duenio=usuario)
-    return render(request, 'perfil.html', {
-        'form': form,
-        'user': usuario,
-        'mascotas': mascotas,
-    })
+    return render(request, 'perfil.html', {'form': form, 'user': usuario, 'mascotas': mascotas})
+
 
 @login_required
 def crear_mascota(request):
     usuario = request.user
 
+    # Validaciones del perfil
     try:
         if not usuario.localidad:
             raise ValueError("Debes completar tu perfil con la localidad correspondiente antes de crear una mascota.")
@@ -130,23 +122,22 @@ def crear_mascota(request):
     except ValueError as e:
         messages.error(request, str(e))
         return redirect('perfil_usuario')
-    
+
     if request.method == 'POST':
         form = MascotaForm(request.POST)
         imagenes = request.FILES.getlist('imagenes')
         if form.is_valid():
             mascota = form.save(commit=False)
-            mascota.duenio = request.user
-            mascota.provincia = request.user.provincia
-            mascota.localidad = request.user.localidad
+            mascota.duenio = usuario
+            mascota.provincia = usuario.provincia
+            mascota.localidad = usuario.localidad
             mascota.save()
-            for img in imagenes[:10]: 
+            for img in imagenes[:10]:
                 MascotaImagen.objects.create(mascota=mascota, imagen=img)
             usuario.actualizar_mascotas_ids()
             return redirect('perfil_usuario')
     else:
         form = MascotaForm()
-        
     return render(request, 'crear_mascota.html', {'form': form})
 
 
@@ -154,11 +145,6 @@ def cargar_localidades(request):
     provincia_id = request.GET.get('provincia_id')
     localidades = Localidad.objects.filter(id_provincia=provincia_id).values('id', 'nombre')
     return JsonResponse(list(localidades), safe=False)
-
-@login_required
-def logout_view(request):
-    logout(request)
-    return redirect('home')  
 
 
 def detalle_mascota(request, mascota_id):
@@ -170,16 +156,12 @@ def detalle_mascota(request, mascota_id):
             mascota.imagenes.update(principal=False)
             MascotaImagen.objects.filter(id=imagen_id, mascota=mascota).update(principal=True)
             return redirect('detalle_mascota', mascota_id=mascota.id)
-    return render(request, 'detalle_mascota.html', {
-        'mascota': mascota,
-        'imagenes': imagenes,
-    })
-
+    return render(request, 'detalle_mascota.html', {'mascota': mascota, 'imagenes': imagenes})
 
 
 def mascotas_por_especie_view(request, especie, template_name):
     form = BusquedaMascotaForm(request.GET or None)
-    mascotas = Mascota.objects.filter(disponible=True, especie=especie)
+    mascotas = Mascota.objects.filter(disponible=True, especie=especie, estado='esperando')
 
     if form.is_valid():
         provincia = form.cleaned_data.get('provincia')
@@ -193,19 +175,20 @@ def mascotas_por_especie_view(request, especie, template_name):
         if castrado is not None:
             mascotas = mascotas.filter(castrado=castrado)
 
-    return render(request, template_name, {
-        'form': form,
-        'mascotas': mascotas,
-    })
+    return render(request, template_name, {'form': form, 'mascotas': mascotas})
+
 
 def perros_view(request):
     return mascotas_por_especie_view(request, especie='perro', template_name='perros.html')
 
+
 def gatos_view(request):
     return mascotas_por_especie_view(request, especie='gato', template_name='gatos.html')
 
+
 def contacto_view(request):
     return render(request, 'contacto.html')
+
 
 @login_required
 def solicitar_mascota(request, mascota_id):
@@ -234,24 +217,46 @@ def solicitar_mascota(request, mascota_id):
 
     return redirect('detalle_mascota', mascota_id=mascota_id)
 
+
 @login_required
 def chat_solicitud(request, solicitud_id):
-    return render(request, 'chat.html', {'solicitud_id': solicitud_id})
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id)
+    mensajes = MensajeChat.objects.filter(solicitud=solicitud).order_by('fecha')
+    existe_traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=solicitud.duenio,
+        duenio_nuevo=solicitud.solicitante,
+        estado='esperando'
+    ).exists()
+
+    if request.method == 'POST' and 'mensaje' in request.POST:
+        texto = request.POST.get('mensaje')
+        if texto:
+            MensajeChat.objects.create(
+                solicitud=solicitud,
+                usuario=request.user,
+                texto=texto
+            )
+        return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+    return render(request, 'chat.html', {
+        'solicitud': solicitud,
+        'mensajes': mensajes,
+        'existe_traspaso': existe_traspaso,
+    })
 
 
 @login_required
 def mis_chats(request):
     solicitudes = SolicitudMascota.objects.filter(
-        models.Q(solicitante=request.user) | models.Q(duenio=request.user)
+        (models.Q(solicitante=request.user) | models.Q(duenio=request.user)) & ~models.Q(estado="rechazada")
     ).order_by('-fecha')
     return render(request, 'mis_chats.html', {'solicitudes': solicitudes})
 
 
 @login_required
 def solicitudes_recibidas(request):
-    solicitudes = SolicitudMascota.objects.filter(
-        duenio=request.user, estado='pendiente'
-    )
+    solicitudes = SolicitudMascota.objects.filter(duenio=request.user, estado='pendiente')
     return render(request, 'solicitudes_recibidas.html', {'solicitudes': solicitudes})
 
 
@@ -262,10 +267,15 @@ def responder_solicitud(request, solicitud_id):
         accion = request.POST.get('accion')
         if accion == 'aceptar':
             solicitud.estado = 'aceptada'
+            solicitud.save()
+            messages.success(request, "Solicitud aceptada. Ahora puedes chatear con el adoptante.")
+            return redirect('chat_solicitud', solicitud_id=solicitud.id)
         elif accion == 'rechazar':
             solicitud.estado = 'rechazada'
-        solicitud.save()
-    return redirect('solicitudes_recibidas')
+            solicitud.save()
+            messages.info(request, "Solicitud rechazada.")
+            return redirect('mis_chats')
+    return render(request, 'responder_solicitud.html', {'solicitud': solicitud})
 
 
 def base_context(request):
@@ -329,9 +339,11 @@ def carrito_api(request):
         for m in mascotas
     ]
     return JsonResponse(data, safe=False)
-#nuevo aporte
+
+
 def no_autenticado_api(request):
     return JsonResponse({"error": "No estás autenticado"}, status=401)
+
 
 def mascotas_api(request):
     mascotas = Mascota.objects.filter(disponible=True)
@@ -345,11 +357,11 @@ def mascotas_api(request):
             "especie": m.especie,
             "provincia": m.provincia.nombre if m.provincia else "",
             "localidad": m.localidad.nombre if m.localidad else "",
-            
             "imagen": m.imagenes.first().imagen.url if m.imagenes.exists() else "",
         })
-    
+
     return JsonResponse(data, safe=False)
+
 
 @login_required
 def ver_carrito(request):
@@ -357,6 +369,7 @@ def ver_carrito(request):
     carrito = Carrito.objects.filter(usuario=usuario)
     data = list(carrito.values())  # o usá un serializer si es DRF
     return JsonResponse(data, safe=False)
+
 
 def mascota_detalle_api(request, mascota_id):
     try:
@@ -373,9 +386,10 @@ def mascota_detalle_api(request, mascota_id):
         return JsonResponse(data)
     except Mascota.DoesNotExist:
         raise Http404("Mascota no encontrada")
-    
+
+
 @api_view(['POST'])
-def api_login(request):
+def api_login_drf(request):
     username = request.data.get('username')
     password = request.data.get('password')
 
@@ -385,22 +399,25 @@ def api_login(request):
         return Response({'token': token.key})
     else:
         return Response({'error': 'Credenciales inválidas'}, status=401)
+
+
 @permission_classes([IsAuthenticated])
 def confirmar_adopcion(request):
     mascotas = request.data.get('mascotas', [])
-    
+
     if not mascotas:
         return Response({"error": "No se enviaron mascotas."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Acá podrías guardar la adopción en una tabla si quisieras
+
+    # Guardar adopción o lógica que quieras
     print("Usuario:", request.user.username)
     print("Mascotas seleccionadas:", mascotas)
 
     return Response({"mensaje": "Adopción registrada correctamente"}, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def carrito_api(request):
+def carrito_api_drf(request):
     usuario = request.user
     mascotas = Mascota.objects.filter(duenio=usuario)
     data = [
@@ -415,7 +432,8 @@ def carrito_api(request):
     ]
     return Response(data)
 
-@csrf_exempt  # Para que no pete si no tenés CSRF (pero mejor tenerlo)
+
+@csrf_exempt
 def api_login(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -431,8 +449,78 @@ def api_login(request):
     else:
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
+
 class CarritoViewSet(viewsets.ModelViewSet):
     queryset = Carrito.objects.all()
     serializer_class = CarritoSerializer
-    authentication_classes = [TokenAuthentication]  # acá
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+@login_required
+def enviar_traspaso(request, solicitud_id):
+    try:
+        solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, duenio=request.user, estado='aceptada')
+        if request.method == 'POST':
+            traspaso = TraspasoMascota.objects.filter(
+                mascota=solicitud.mascota,
+                duenio_anterior=request.user,
+                duenio_nuevo=solicitud.solicitante
+            ).order_by('-fecha').first()
+            if traspaso and traspaso.estado == 'esperando':
+                messages.info(request, "Ya existe una solicitud de traspaso pendiente para esta mascota.")
+            elif traspaso and traspaso.estado == 'rechazada':
+                traspaso.estado = 'esperando'
+                traspaso.save()
+                messages.success(request, "Solicitud de traspaso reenviada.")
+            else:
+                TraspasoMascota.objects.create(
+                    mascota=solicitud.mascota,
+                    duenio_anterior=request.user,
+                    duenio_nuevo=solicitud.solicitante,
+                    estado='esperando'
+                )
+                messages.success(request, "Solicitud de traspaso enviada.")
+    except Exception as e:
+        messages.error(request, f"Ocurrió un error al enviar el traspaso: {str(e)}")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+
+@login_required
+def responder_traspaso(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, solicitante=request.user)
+    traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=solicitud.duenio,
+        duenio_nuevo=request.user,
+        estado='esperando'
+    ).first()
+    if request.method == 'POST' and traspaso:
+        accion = request.POST.get('accion')
+        if accion == 'aceptar':
+            traspaso.estado = 'aceptada'
+            traspaso.save()
+            solicitud.mascota.cambiar_duenio(request.user)
+            solicitud.mascota.estado = 'adoptado'
+            solicitud.mascota.save()
+            messages.success(request, "¡Has aceptado el traspaso! Ahora eres el dueño de la mascota.")
+        elif accion == 'rechazar':
+            traspaso.estado = 'rechazada'
+            traspaso.save()
+            messages.info(request, "Has rechazado el traspaso.")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)
+
+
+@login_required
+def cancelar_traspaso(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudMascota, id=solicitud_id, duenio=request.user)
+    traspaso = TraspasoMascota.objects.filter(
+        mascota=solicitud.mascota,
+        duenio_anterior=request.user,
+        duenio_nuevo=solicitud.solicitante,
+        estado='esperando'
+    ).first()
+    if request.method == 'POST' and traspaso:
+        traspaso.delete()
+        messages.success(request, "Solicitud de traspaso cancelada.")
+    return redirect('chat_solicitud', solicitud_id=solicitud_id)

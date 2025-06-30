@@ -17,6 +17,8 @@
       <button type="submit" class="btn-login">Entrar</button>
     </form>
 
+    <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+
     {% if mensaje %}
       <div class="login-alert">{{ mensaje }}</div>
     {% endif %}

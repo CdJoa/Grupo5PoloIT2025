@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>
+  Chat con 
+  {% if solicitud.duenio == user %}
+    {{ solicitud.solicitante.username }}
+  {% else %}
+    {{ solicitud.duenio.username }}
+  {% endif %}
+  sobre <span style="color:#ffa500;">{{ solicitud.mascota.nombre }}</span>
+</h2>
+
+<div style="display:flex; align-items:center; gap:1em; margin-bottom:1em;">
+  {% if solicitud.mascota.imagenes.all %}
+    <img src="{{ solicitud.mascota.imagenes.all.0.imagen.url }}" alt="Foto de {{ solicitud.mascota.nombre }}" width="80" style="border-radius:8px;">
+  {% endif %}
+  <span><b>Mascota:</b> {{ solicitud.mascota.nombre }}</span>
+</div>
+
+<div style="border:1px solid #ffa500; padding:1em; margin-bottom:1em; background:#fff;">
+  {% for mensaje in mensajes %}
+    {% if mensaje.usuario == user %}
+      <div style="margin-bottom:0.5em; text-align:right; background:#e6ffe6; padding:0.5em; border-radius:6px;">
+    {% else %}
+      <div style="margin-bottom:0.5em; text-align:left; background:#f9f9f9; padding:0.5em; border-radius:6px;">
+    {% endif %}
+      <b>
+        {% if mensaje.usuario == user %}
+          Tú
+        {% else %}
+          {{ mensaje.usuario.username }}
+        {% endif %}
+      :</b>
+      {{ mensaje.texto }}
+      <span style="font-size:0.8em;color:#888;">{{ mensaje.fecha|date:"d/m/Y H:i" }}</span>
+    </div>
+  {% empty %}
+    <div>No hay mensajes aún.</div>
+  {% endfor %}
+</div>
+<form method="post">
+  {% csrf_token %}
+  <input type="text" name="mensaje" style="width:70%;" required>
+  <button type="submit">Enviar</button>
+</form>
+
+{% if solicitud.duenio == user and solicitud.estado == "aceptada" %}
+  {% if not existe_traspaso %}
+    {% if not ultimo_traspaso or ultimo_traspaso.estado != "esperando" %}
+      <form method="post" action="{% url 'enviar_traspaso' solicitud.id %}" style="margin-bottom:1em;">
+        {% csrf_token %}
+        <button type="submit" style="background:#ffa500; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+          Enviar solicitud de traspaso
+        </button>
+      </form>
+    {% endif %}
+  {% elif ultimo_traspaso and ultimo_traspaso.estado == "rechazada" %}
+    <div style="color:red; margin-bottom:0.5em;">
+      El solicitante rechazó el traspaso. Puedes reenviarlo si lo deseas.
+    </div>
+    <form method="post" action="{% url 'enviar_traspaso' solicitud.id %}">
+      {% csrf_token %}
+      <button type="submit" style="background:#ffa500; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+        Reenviar solicitud de traspaso
+      </button>
+    </form>
+  {% elif existe_traspaso %}
+    <div style="color:orange;">Ya existe una solicitud de traspaso pendiente.</div>
+  {% endif %}
+{% endif %}
+
+{% if solicitud.solicitante == user and existe_traspaso %}
+  <div style="margin-bottom:0.5em; color:#333;">
+    El dueño de la mascota te está proponiendo traspasarte a <b>{{ solicitud.mascota.nombre }}</b>. ¿Aceptás el traspaso?
+  </div>
+  <form method="post" action="{% url 'responder_traspaso' solicitud.id %}" style="margin-bottom:1em;">
+    {% csrf_token %}
+    <button name="accion" value="aceptar" style="background:green; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+      Aceptar traspaso
+    </button>
+    <button name="accion" value="rechazar" style="background:red; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+      Rechazar traspaso
+    </button>
+  </form>
+{% endif %}
+
+{% if solicitud.duenio == user and ultimo_traspaso and ultimo_traspaso.estado == "rechazada" %}
+  <div style="color:red; margin-bottom:0.5em;">
+    El solicitante rechazó el traspaso. Puedes reenviarlo si lo deseas.
+  </div>
+  <form method="post" action="{% url 'enviar_traspaso' solicitud.id %}">
+    {% csrf_token %}
+    <button type="submit" style="background:#ffa500; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+      Reenviar solicitud de traspaso
+    </button>
+  </form>
+{% endif %}
+
+{% if solicitud.duenio == user and existe_traspaso %}
+  <form method="post" action="{% url 'cancelar_traspaso' solicitud.id %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" style="background:#888; color:#fff; border:none; padding:0.5em 1em; border-radius:5px;">
+      Cancelar traspaso
+    </button>
+  </form>
+{% endif %}
+{% endblock %}
