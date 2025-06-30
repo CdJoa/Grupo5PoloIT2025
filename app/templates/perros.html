@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Perros en Adopción{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perros_gatos.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="titulo-section">
+  <h1>Perros en adopción 🐶</h1>
+</div>
+
+<form method="get" class="search-form">
+  <fieldset>
+    <legend>Filtrar por:</legend>
+    <p>{{ form.provincia.label_tag }} {{ form.provincia }}</p>
+    <p>{{ form.localidad.label_tag }} {{ form.localidad }}</p>
+    <p>{{ form.castrado.label_tag }} {{ form.castrado }}</p>
+  </fieldset>
+  <button type="submit">🔎 Buscar</button>
+</form>
+
+<hr>
+
+<div class="subtitulo-section">
+  <h2>Resultados encontrados</h2>
+</div>
+
+{% if mascotas %}
+  <section class="cards-container">
+    {% for mascota in mascotas %}
+      <article class="card-custom">
+        <a href="{% url 'detalle_mascota' mascota.id %}">
+          {% with mascota.imagenes.all|first as imagen %}
+            {% if imagen %}
+              <img src="{{ imagen.imagen.url }}" alt="{{ mascota.nombre }}">
+            {% else %}
+              <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+            {% endif %}
+          {% endwith %}
+        </a>
+        <div class="card-body-custom">
+          <h3 class="card-title-custom">{{ mascota.nombre }}</h3>
+          <p class="card-text-custom">
+            <strong>Provincia:</strong> {{ mascota.provincia }}<br>
+            <strong>Localidad:</strong> {{ mascota.localidad }}<br>
+            <strong>Edad:</strong> {{ mascota.get_edad_display }}<br>
+            <strong>Raza:</strong> {{ mascota.raza }}<br>
+            <strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}
+          </p>
+          <a href="{% url 'detalle_mascota' mascota.id %}" class="btn-adoptar">Ver detalle</a>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <p>No hay perros que coincidan con la búsqueda.</p>
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const provinciaSelect = document.getElementById("id_provincia");
+    const localidadSelect = document.getElementById("id_localidad");
+
+    if (provinciaSelect && localidadSelect) {
+        provinciaSelect.addEventListener('change', function() {
+            localidadSelect.innerHTML = '<option>Cargando...</option>';
+            fetch(`/ajax/cargar-localidades/?provincia_id=${provinciaSelect.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    localidadSelect.innerHTML = '<option value="">Seleccioná una localidad</option>';
+                    data.forEach(function(localidad) {
+                        const option = document.createElement('option');
+                        option.value = localidad.id;
+                        option.text = localidad.nombre;
+                        localidadSelect.appendChild(option);
+                    });
+                });
+        });
+    }
+});
+</script>
+
+{% endblock %}

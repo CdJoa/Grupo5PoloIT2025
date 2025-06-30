@@ -31,17 +31,19 @@ ALLOWED_HOSTS = [
     "grupo5poloit2025-production-c9b8.up.railway.app",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://grupo5poloit2025-production-c9b8.up.railway.app"
+    "https://grupo5poloit2025-production-c9b8.up.railway.app",
 ]
 
-
-# Para que también funcione en localhost
 if os.getenv("DJANGO_ENV") != "production":
     ALLOWED_HOSTS.append("127.0.0.1")
     ALLOWED_HOSTS.append("localhost")
+    CSRF_TRUSTED_ORIGINS += [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+    ]
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -51,9 +53,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'login'
+    'cloudinary_storage',
+    'cloudinary',
+    'channels',
 
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dlpzpq1hg',
+    'API_KEY': '565574663485436',
+    'API_SECRET': '8cAGVT75RC9pk8L6zuuuuqxyAjc',
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 
 MIDDLEWARE = [
@@ -96,7 +108,7 @@ DATABASES = {
     'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
-
+AUTH_USER_MODEL = 'app.Usuario'  
 
 
 # Password validation
@@ -144,8 +156,27 @@ STATICFILES_DIRS = [
 ]
 
 
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Expira la sesión tras 30 minutos (1800 segundos) de inactividad
+SESSION_COOKIE_AGE = 1800  # 30 minutos en segundos
+SESSION_SAVE_EVERY_REQUEST = True  # Reinicia el contador con cada request
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'matchpettest@gmail.com'     
+EMAIL_HOST_PASSWORD = 'jeyw yeuc ifuo pbhf '  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

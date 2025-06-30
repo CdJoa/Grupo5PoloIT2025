@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="chat-list-container">
+  <h2 class="chat-title">Mis Chats</h2>
+  <div class="chats-grid">
+    {% regroup solicitudes by mascota as chats_por_mascota %}
+    {% for grupo in chats_por_mascota %}
+      <div class="chat-card">
+        <h3>
+          {% if grupo.grouper.imagenes.all %}
+            <img src="{{ grupo.grouper.imagenes.all.0.imagen.url }}" alt="Foto de {{ grupo.grouper.nombre }}" class="chat-img-thumb">
+          {% endif %}
+          Mascota: <span class="chat-mascota-nombre">{{ grupo.grouper.nombre }}</span>
+        </h3>
+        {% for solicitud in grupo.list %}
+          <div class="chat-item">
+            {% if solicitud.solicitante == user %}
+              Con Dueño: <b>{{ solicitud.duenio.username }}</b>
+            {% else %}
+              Con Solicitante: <b>{{ solicitud.solicitante.username }}</b>
+            {% endif %}
+            <br>
+            Estado:
+            {% if solicitud.estado == "pendiente" %}
+              <span class="estado estado-pendiente">(Esperando confirmación)</span>
+              {% if solicitud.duenio == user %}
+                <form method="post" action="{% url 'responder_solicitud' solicitud.id %}" class="form-respuesta">
+                  {% csrf_token %}
+                  <button name="accion" value="aceptar" class="btn-aceptar">Aceptar</button>
+                  <button name="accion" value="rechazar" class="btn-rechazar">Rechazar</button>
+                </form>
+              {% endif %}
+            {% elif solicitud.estado == "aceptada" %}
+              <a href="{% url 'chat_solicitud' solicitud.id %}" class="link-chat">Ir al chat</a>
+            {% elif solicitud.estado == "rechazada" %}
+              <span class="estado estado-rechazada">(Solicitud rechazada)</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% empty %}
+      <p>No tenés chats activos.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('button[name="accion"]').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        const accion = btn.value;
+        if (!confirm(`¿Estás seguro de que deseas ${accion} esta solicitud?`)) {
+          e.preventDefault();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

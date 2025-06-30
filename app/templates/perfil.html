@@ -1,0 +1,104 @@
+{% extends "base.html" %} 
+{% load static %}
+
+{% block title %}Mi Perfil – PetMatch{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perros_gatos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="perfil-container">
+  <h2 class="perfil-title">Mi Perfil</h2>
+
+  <div class="perfil-form-wrapper">
+    <form method="POST" class="perfil-form">
+      {% csrf_token %}
+      <h3>Datos personales</h3>
+
+      {{ form.first_name.label_tag }}{{ form.first_name }}
+      {{ form.email.label_tag }}{{ form.email }}
+      {{ form.documento.label_tag }}{{ form.documento }}
+      {{ form.telefono.label_tag }}{{ form.telefono }}
+      {{ form.provincia.label_tag }}{{ form.provincia }}
+      {{ form.localidad.label_tag }}{{ form.localidad }}
+
+      <button type="submit" class="btn-guardar">Guardar cambios</button>
+    </form>
+  </div>
+
+  {% if not user.email_verificado %}
+    <div style="color: orange; margin-bottom: 1em;">
+      <b>Tu email no está verificado.</b><br>
+      <form method="post" action="{% url 'reenviar_verificacion' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn-secundario">Reenviar email de verificación</button>
+      </form>
+    </div>
+  {% endif %}
+
+  <div class="perfil-mascotas">
+    <div class="mascotas-header">
+      <h3>Mis Mascotas</h3>
+      <a href="{% url 'crear_mascota' %}" class="btn-agregar-mascota">+ Agregar Mascota</a>
+    </div>
+
+    {% if mascotas %}
+      <ul class="mascota-lista">
+        {% for m in mascotas %}
+          <li class="mascota-item">
+            <a href="{% url 'detalle_mascota' m.id %}">
+              <strong>{{ m.nombre }}</strong> – {{ m.raza }}
+              <div class="mascota-imagenes">
+                {% for img in m.imagenes.all %}
+                  <img src="{{ img.imagen.url }}" alt="{{ m.nombre }}">
+                {% endfor %}
+              </div>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No tenés mascotas registradas.</p>
+    {% endif %}
+  </div>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+  <div class="logout-btn-container">
+    <a href="{% url 'logout' %}" class="btn-logout">Cerrar sesión</a>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const provinciaSelect = document.getElementById("id_provincia");
+  const localidadSelect = document.getElementById("id_localidad");
+
+  provinciaSelect.addEventListener('change', function () {
+    localidadSelect.innerHTML = '<option>Cargando...</option>';
+    fetch(`/ajax/cargar-localidades/?provincia_id=${provinciaSelect.value}`)
+      .then(response => response.json())
+      .then(data => {
+        localidadSelect.innerHTML = '<option value="">Seleccioná una localidad</option>';
+        data.forEach(function (localidad) {
+          const option = document.createElement('option');
+          option.value = localidad.id;
+          option.text = localidad.nombre;
+          localidadSelect.appendChild(option);
+        });
+      });
+  });
+});
+</script>
+
+{% endblock %}

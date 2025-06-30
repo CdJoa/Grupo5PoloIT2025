@@ -1,0 +1,167 @@
+.perfil-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background-color: #fff8f0;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.perfil-title {
+  color: #e65100;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.perfil-form-wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.perfil-form-wrapper .alert {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 1.2rem 0.5rem;
+  border-radius: 8px;
+}
+
+.perfil-form {
+  flex: 1 1 60%;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.15rem;
+}
+
+.perfil-form label {
+  font-weight: bold;
+  color: #290B00;
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.perfil-form input,
+.perfil-form select,
+.perfil-form textarea {
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1.1rem;
+}
+
+.btn-guardar {
+  margin-top: 1.5rem;
+  padding: 0.9rem;
+  background-color: #e65100;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  font-size: 1.15rem;
+}
+
+.btn-guardar:hover {
+  background-color: #bf360c;
+}
+
+.perfil-foto img {
+  border-radius: 8px;
+  max-width: 150px;
+  height: auto;
+  object-fit: cover;
+  border: 2px solid #e65100;
+}
+
+.perfil-mascotas {
+  margin-top: 2.5rem;
+}
+
+.mascotas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-agregar-mascota {
+  background-color: #e65100;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-agregar-mascota:hover {
+  background-color: #bf360c;
+}
+
+.mascota-lista {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.mascota-item {
+  margin-bottom: 1.2rem;
+  background-color: #fef3e7;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.mascota-imagenes img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+  border: 1px solid #ccc;
+}
+
+.logout-btn-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.btn-logout {
+  background-color: #666;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-logout:hover {
+  background-color: #333;
+}
+
+.mascota-item a {
+  text-decoration: none;
+  color: #290B00; /* mismo color que el resto del contenido */
+  font-weight: 600;
+  font-size: 1rem;
+  display: inline-block;
+}
+
+.mascota-item a:hover {
+  text-decoration: underline;
+  color: #e65100;
+}
+.btn-secundario {
+  background-color: #999999;
+  color: #fef3e7;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contacto – PetMatch{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/contacto.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="contacto-container">
+  <h2>Contacto</h2>
+  <p>Podés contactarnos completando el siguiente formulario o a través de nuestros canales directos:</p>
+
+  <form method="post" class="contacto-form">
+    {% csrf_token %}
+    <div>
+      {{ form.nombre.label_tag }}
+      {{ form.nombre }}
+    </div>
+    <div>
+      {{ form.email.label_tag }}
+      {{ form.email }}
+    </div>
+    <div>
+      {{ form.tema.label_tag }}
+      {{ form.tema }}
+    </div>
+    <div>
+      {{ form.mensaje.label_tag }}
+      {{ form.mensaje }}
+    </div>
+    <button type="submit" class="btn-link btn-link-orange">Enviar</button>
+  </form>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endblock %}

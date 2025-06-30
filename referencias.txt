@@ -1,0 +1,18 @@
+referencias tomadas
+
+
+    Crud Usuarios:
+    https://www.youtube.com/watch?v=e6PkGDH4wWA
+
+
+    Chats:
+    https://channels.readthedocs.io/en/latest/index.html
+
+
+    Django funciones en general:
+    https://docs.djangoproject.com/en/5.2/
+
+    #conexion y configuracion pgadmin -railway -repositorio
+
+    https://www.youtube.com/watch?v=0wzQt19Vheo&t
+

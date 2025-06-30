@@ -1,0 +1,28 @@
+.hero video {
+  width: 100%;
+  max-height: 600px;
+  object-fit: cover;
+  display: block;
+}
+
+.carrusel-imagenes {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 20px;
+  scroll-snap-type: x mandatory;
+}
+
+.imagen-carrusel {
+  flex: 0 0 auto;
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+  scroll-snap-align: center;
+}
+
+.imagen-carrusel:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Agregar Mascota – PetMatch{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="perfil-container">
+  <h2 class="perfil-title">Agregar Mascota</h2>
+  <div class="perfil-form-wrapper">
+    <form method="POST" enctype="multipart/form-data" class="perfil-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <label for="id_imagenes">Imágenes (hasta 10):</label>
+      <input type="file" name="imagenes" id="id_imagenes" multiple accept="image/*"><br><br>
+      <button type="submit" class="btn-guardar">Guardar mascota</button>
+    </form>
+    {% if mascota %}
+      <div class="imagenes-actuales">
+        {% for img in mascota.imagenes.all %}
+          <img src="{{ img.imagen.url }}" width="200">
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  <a href="{% url 'perfil_usuario' %}" class="btn-volver-perfil">
+    ← Volver al perfil
+  </a>
+</div>
+{% endblock %}

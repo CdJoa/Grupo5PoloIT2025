@@ -1,15 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'estilo.css' %}">
+{% extends "base.html" %}
+{% load static %}
 
-    <title>Inicio</title>
-</head>
-<body>
-    <h1>Django + PostgreSQL</h1>
-    <a href="{% url 'usuarios' %}"><button>Ir a Usuarios</button></a>
-    <a href="{% url 'mascotas' %}"><button>Ir a Mascotas</button></a>
-</body>
-</html>
+{% block title %}Inicio{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <video id="heroVideo" autoplay muted loop playsinline>
+      <source src="{% static 'videos/cat_dog.mp4' %}" type="video/mp4" />
+    </video>
+  </section>
+
+  <section class="carousel-roll container mt-5 mb-5">
+  <h2></h2>
+  {% if mascotas %}
+    <div class="carrusel-imagenes">
+      {% for mascota in mascotas %}
+        {% if mascota.imagenes.first %}
+          <a href="{% url 'detalle_mascota' mascota.id %}">
+            <img src="{{ mascota.imagenes.first.imagen.url }}" alt="{{ mascota.nombre }}" class="imagen-carrusel" />
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay mascotas disponibles.</p>
+  {% endif %}
+  </section>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const video = document.getElementById('heroVideo');
+      if (video) {
+        video.playbackRate = 0.5;
+      }
+    });
+  </script>
+{% endblock %}

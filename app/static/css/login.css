@@ -1,0 +1,126 @@
+.login-container {
+  max-width: 400px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #fff8f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+}
+
+.login-title {
+  text-align: center;
+  color: #e65100;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.login-form p {
+  margin-bottom: 1rem;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #290B00;
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background-color: white;
+}
+
+.btn-login,
+.btn-registrarse {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #666;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-login:hover,
+.btn-registrarse:hover {
+  background-color: #444;
+}
+
+.login-alert {
+  margin-top: 1rem;
+  padding: 0.7rem;
+  background-color: #d4edda;
+  color: #155724;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.login-links {
+  margin-top: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-link {
+  display: inline-block;
+  margin: 0.2rem 0.3rem;
+  color: #e65100;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.login-link:hover {
+  background: #ffe0b2;
+  color: #290B00;
+}
+
+.btn-link {
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0.5rem 0;
+}
+
+.btn-link-orange {
+  background-color: #e65100;
+  color: #fff;
+  border: none;
+}
+
+.btn-link-orange:hover {
+  background-color: #b34700;
+  color: #fff;
+}
+
+.btn-link-white {
+  background: #fff;
+  color: #e65100;
+  border: 2px solid #e65100;
+}
+
+.btn-link-white:hover {
+  background: #ffe0b2;
+  color: #b34700;
+  border-color: #b34700;
+}
