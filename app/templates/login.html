@@ -17,7 +17,11 @@
       <button type="submit" class="btn-login">Entrar</button>
     </form>
 
-    <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+    <a href="{% url 'password_reset' %}" 
+      class="login-link text-decoration-none fw-bold text-center d-block mt-3"
+      style="color: #e65100;">
+      ¿Olvidaste tu contraseña?
+    </a>
 
     {% if mensaje %}
       <div class="login-alert">{{ mensaje }}</div>

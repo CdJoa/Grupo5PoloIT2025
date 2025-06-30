@@ -43,13 +43,20 @@
             <p><strong>Provincia:</strong> {{ mascota.provincia }}</p>
             <p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
             <p><strong>Descripción:</strong><br>{{ mascota.descripcion }}</p>
-            <div class="d-flex align-items-center mt-3">
-                <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <a href="{% url 'login' %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
-            </div>
 
+            <div class="d-flex align-items-center mt-3">
+              <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
+                <i class="fas fa-arrow-left"></i>
+              </a>
+              {% if user.is_authenticated and mascota.duenio != user %}
+                <form method="post" action="{% url 'solicitar_mascota' mascota.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</button>
+                </form>
+              {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
@@ -58,60 +65,46 @@
         <h2 class="card-title">{{ mascota.nombre }}</h2>
         <p>No hay imágenes disponibles.</p>
         <div class="d-flex align-items-center mt-3">
-            <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
-                <i class="fas fa-arrow-left"></i>
-            </a>
-            <a href="{% url 'login' %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+          <a href="javascript:history.back()" class="volver-flecha" title="Volver atrás">
+            <i class="fas fa-arrow-left"></i>
+          </a>
+          {% if user.is_authenticated and mascota.duenio != user %}
+            <form method="post" action="{% url 'solicitar_mascota' mascota.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</button>
+            </form>
+          {% elif not user.is_authenticated %}
+            <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}" class="btn-adoptar-custom ms-5">¡Quiero Adoptar!</a>
+          {% endif %}
         </div>
-
       </div>
     {% endif %}
   </div>
 </div>
 
-<<<<<<< HEAD
-{% endblock %}
-=======
-<p><strong>Edad:</strong> {{ mascota.edad }}</p>
-<p><strong>Especie:</strong> {{ mascota.especie }}</p>
-<p><strong>Descripción:</strong> {{ mascota.descripcion }}</p>
-<p><strong>Castrado:</strong> {{ mascota.castrado|yesno:"Sí,No" }}</p>
-<p><strong>Provincia:</strong> {{ mascota.provincia}}</p>
-<p><strong>Localidad:</strong> {{ mascota.localidad }}</p>
-
-{% if user.is_authenticated %}
-    {% if mascota.duenio == user %}
-        <h3>Solicitudes de adopción recibidas</h3>
-        <ul>
-        {% for solicitud in mascota.solicitudes.all %}
-            <li>
-                Solicitante: {{ solicitud.solicitante.username }}<br>
-                Estado: {{ solicitud.estado }}<br>
-                {% if solicitud.estado == "pendiente" %}
-                    <form method="post" action="{% url 'responder_solicitud' solicitud.id %}">
-                        {% csrf_token %}
-                        <button name="accion" value="aceptar">Aceptar</button>
-                        <button name="accion" value="rechazar">Rechazar</button>
-                    </form>
-                {% elif solicitud.estado == "aceptada" %}
-                    <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
-                {% elif solicitud.estado == "rechazada" %}
-                    <span style="color: red;">(Solicitud rechazada)</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No hay solicitudes para esta mascota.</li>
-        {% endfor %}
-        </ul>
-    {% elif mascota.duenio != user %}
-        <form method="post" action="{% url 'solicitar_mascota' mascota.id %}">
+{% if user.is_authenticated and mascota.duenio == user %}
+  <h3>Solicitudes de adopción recibidas</h3>
+  <ul>
+    {% for solicitud in mascota.solicitudes.all %}
+      <li>
+        Solicitante: {{ solicitud.solicitante.username }}<br>
+        Estado: {{ solicitud.estado }}<br>
+        {% if solicitud.estado == "pendiente" %}
+          <form method="post" action="{% url 'responder_solicitud' solicitud.id %}">
             {% csrf_token %}
-            <button type="submit">Solicitar adopción</button>
-        </form>
-    {% endif %}
-    <a href="{% url 'perfil_usuario' %}">Volver a mi perfil</a>
-{% else %}
-    <a href="{% url 'login' %}?next={% url 'detalle_mascota' mascota.id %}">Iniciá sesión para solicitar adopción</a>
+            <button name="accion" value="aceptar">Aceptar</button>
+            <button name="accion" value="rechazar">Rechazar</button>
+          </form>
+        {% elif solicitud.estado == "aceptada" %}
+          <a href="{% url 'chat_solicitud' solicitud.id %}">Ir al chat</a>
+        {% elif solicitud.estado == "rechazada" %}
+          <span style="color: red;">(Solicitud rechazada)</span>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No hay solicitudes para esta mascota.</li>
+    {% endfor %}
+  </ul>
 {% endif %}
+
 {% endblock %}
->>>>>>> e7b3cd303bb562f80b2754fe157fe3701b4aa029

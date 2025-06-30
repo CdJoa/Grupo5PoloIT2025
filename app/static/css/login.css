@@ -61,3 +61,19 @@
   border-radius: 6px;
   text-align: center;
 }
+
+.login-container a.login-link {
+  color: #e65100 !important;
+  font-weight: bold;
+  text-decoration: none !important;
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.login-container a.login-link:hover {
+  color: #bf360c !important;
+  text-decoration: underline !important;
+}
