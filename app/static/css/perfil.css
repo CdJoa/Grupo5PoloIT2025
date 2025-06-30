@@ -156,7 +156,7 @@
 .btn-volver-perfil {
   display: inline-block;
   margin-top: 2rem;
-  background-color: #e65100;
+  background-color: #666;
   color: #fff;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -166,6 +166,30 @@
 }
 
 .btn-volver-perfil:hover {
-  background-color: #bf360c;
+  background-color: #333;
   text-decoration: underline;
+}
+
+/* ORDENAR {{ form.as_p }} 👇 */
+.perfil-form p {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.perfil-form p label {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #290B00;
+}
+
+.perfil-form p input,
+.perfil-form p select,
+.perfil-form p textarea {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
