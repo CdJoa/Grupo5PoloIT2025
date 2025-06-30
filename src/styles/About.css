@@ -1,0 +1,33 @@
+.about-container {
+  background-color: #fff;
+  padding: 0;
+  margin: 0;
+}
+
+.about-banner {
+  width: 90%;      /* o el ancho que quieras */
+  height: 690px;   /* fijás una altura fija */
+  object-fit: cover;  /* recorta y ajusta la imagen para cubrir el contenedor */
+  object-position: top; /* enfoca la parte superior, recorta abajo */
+  display: block;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+.about-content {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.about-content h1 {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.about-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+}
