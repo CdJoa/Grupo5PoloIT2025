@@ -30,20 +30,24 @@
   margin-top: 0.2rem;
 }
 
+.btn-iniciar-sesion,
 .btn-registrarse {
-  margin-top: 1.5rem;
+  display: inline-block;
+  margin-top: 2rem;
   padding: 0.6rem 1.2rem;
-  background-color: #e65100;
+  background-color: #666;
   color: white;
-  border: none;
   border-radius: 6px;
+  text-decoration: none;
   font-weight: bold;
+  border: none;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
+.btn-iniciar-sesion:hover,
 .btn-registrarse:hover {
-  background-color: #bf360c;
+  background-color: #444;
 }
 
 .registro-errores {

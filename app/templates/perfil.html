@@ -14,35 +14,19 @@
   <h2 class="perfil-title">Mi Perfil</h2>
 
   <div class="perfil-form-wrapper">
-    <form method="POST" enctype="multipart/form-data" class="perfil-form">
+    <form method="POST" class="perfil-form">
       {% csrf_token %}
       <h3>Datos personales</h3>
 
       {{ form.first_name.label_tag }}{{ form.first_name }}
-
-      <label for="id_email">Email:</label>
-      <input type="email" id="id_email" value="{{ user.email }}" disabled class="input-disabled" />
-
-      <label for="{{ form.documento.id_for_label }}">Documento:</label>
-      {{ form.documento }}
-
-      <label for="{{ form.telefono.id_for_label }}">Teléfono:</label>
-      {{ form.telefono }}
-
-      <label for="{{ form.provincia.id_for_label }}">Provincia:</label>
-      {{ form.provincia }}
-
-      <label for="{{ form.localidad.id_for_label }}">Localidad:</label>
-      {{ form.localidad }}
+      {{ form.email.label_tag }}{{ form.email }}
+      {{ form.documento.label_tag }}{{ form.documento }}
+      {{ form.telefono.label_tag }}{{ form.telefono }}
+      {{ form.provincia.label_tag }}{{ form.provincia }}
+      {{ form.localidad.label_tag }}{{ form.localidad }}
 
       <button type="submit" class="btn-guardar">Guardar cambios</button>
     </form>
-
-    {% if user.foto %}
-      <div class="perfil-foto">
-        <img src="{{ user.foto.url }}" alt="Foto de perfil">
-      </div>
-    {% endif %}
   </div>
 
   {% if not user.email_verificado %}
@@ -88,6 +72,7 @@
       {% endfor %}
     </ul>
   {% endif %}
+
 
   <div class="logout-btn-container">
     <a href="{% url 'logout' %}" class="btn-logout">Cerrar sesión</a>

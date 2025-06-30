@@ -14,12 +14,13 @@
     <form method="post" action="{% url 'login' %}" class="login-form">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit" class="btn-login">Entrar</button>
+      <button type="submit" class="btn-link btn-link-orange">Entrar</button>
     </form>
 
-    <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
-    <br>
-    <a href="{% url 'signup' %}" class="btn-signup">¿No tenés cuenta? Registrate</a>
+    <div class="login-links">
+      <a href="{% url 'password_reset' %}" class="btn-link btn-link-white">¿Olvidaste tu contraseña?</a>
+      <a href="{% url 'signup' %}" class="btn-link btn-link-white">¿No tenés cuenta? Registrate</a>
+    </div>
 
     {% if mensaje %}
       <div class="login-alert">{{ mensaje }}</div>
