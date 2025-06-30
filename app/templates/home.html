@@ -1,17 +1,43 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}Task Page{% endblock %}
+{% block title %}Inicio{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
 
 {% block content %}
-    <h1>test</h1>
-    <p>Welcome to the task page!</p>
-    <p>Here you can manage your tasks.</p>
-    <ul>
-        <li>Task 1</li>
-        <li>Task 2</li>
-        <li>Task 3</li>
-    </ul>
-    <p>Feel free to add, edit, or delete tasks as needed.</p>
+  <section class="hero">
+    <video id="heroVideo" autoplay muted loop playsinline>
+      <source src="{% static 'videos/cat_dog.mp4' %}" type="video/mp4" />
+    </video>
+  </section>
+
+  <section class="carousel-roll container mt-5 mb-5">
+  <h2></h2>
+  {% if mascotas %}
+    <div class="carrusel-imagenes">
+      {% for mascota in mascotas %}
+        {% if mascota.imagenes.first %}
+          <a href="{% url 'detalle_mascota' mascota.id %}">
+            <img src="{{ mascota.imagenes.first.imagen.url }}" alt="{{ mascota.nombre }}" class="imagen-carrusel" />
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay mascotas disponibles.</p>
+  {% endif %}
+  </section>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const video = document.getElementById('heroVideo');
+      if (video) {
+        video.playbackRate = 0.5;
+      }
+    });
+  </script>
 {% endblock %}
